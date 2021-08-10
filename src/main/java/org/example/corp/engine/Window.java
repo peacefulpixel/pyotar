@@ -12,7 +12,6 @@ import org.example.corp.engine.exception.ShaderInitializationException;
 import org.example.corp.engine.exception.WindowInitializationException;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.example.corp.engine.util.LoggerUtils;
-import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryStack;
 
@@ -41,6 +40,7 @@ public class Window {
     private int width;
     private int height;
     private boolean vSyncEnabled = false;
+    private Camera camera;
 
     public void init() throws EngineException {
         init(WINDOW_DWIDTH, WINDOW_DHEIGHT, WindowType.BORDERED);
@@ -82,6 +82,10 @@ public class Window {
         if (glfwId.get() == NULL) {
             throw new WindowInitializationException("Unable to create GLFW window");
         }
+
+        if (camera == null) {
+            camera = new Camera();
+        }
     }
 
     public void initAfterSettingsContext() {
@@ -91,23 +95,8 @@ public class Window {
         glDepthFunc(GL_LESS);
         glClearColor(0.5f, 0.0f, 0.5f, 0.0f);
 
-        glfwSetWindowSizeCallback(glfwId.get(), (wid, w, h) -> {
-            EventManager.provideEvent(new WindowResizedEvent(width, height, w, h));
-            width = w;
-            height = h;
-            glViewport(0, 0, width, height);
-            try {
-                ShaderProgramsManager.getDefaultProgram().setUniform("ortho", width, height);
-            } catch (ShaderInitializationException e) {
-                logger.log(Level.SEVERE, "Unable to set uniform", e);
-            }
-        });
-
         glEnable(GL_MULTISAMPLE);
-        glViewport(0, 0, width, height);
         glMatrixMode(GL_PROJECTION);
-        float aspect = (float)width / (float)height;
-        glOrtho(-aspect, aspect, -1, 1, -1, 1);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -160,6 +149,26 @@ public class Window {
         glfwSetScrollCallback(getGlfwId(), (wId, xOffset, yOffset) ->
                 EventManager.provideEvent(new MouseScrollEvent(Mouse.mouseX, Mouse.mouseY, yOffset > 0)));
 
+        glfwSetWindowSizeCallback(glfwId.get(), (wid, w, h) -> {
+            EventManager.provideEvent(new WindowResizedEvent(width, height, w, h));
+            width = w;
+            height = h;
+            refreshViewport();
+        });
+    }
+
+    public void refreshViewport(float width, float height, double aspect) {
+        glViewport(0, 0, (int) width, (int) height);
+        glOrtho(-aspect/2, aspect/2, -1, 1, -1, 1);
+        try {
+            ShaderProgramsManager.getDefaultProgram().setUniform("ortho", width/2, height/2);
+        } catch (ShaderInitializationException e) {
+            logger.log(Level.SEVERE, "Unable to set uniform", e);
+        }
+    }
+
+    public void refreshViewport() {
+        refreshViewport(camera.getWidth(), camera.getHeight(), camera.getAspect());
     }
 
     public long getGlfwId() {
@@ -229,8 +238,18 @@ public class Window {
         glfwSetWindowSize(glfwId.get(), width, height);
     }
 
-    public void onWidowResize(EventListener<WindowResizedEvent> listener) {
-        EventManager.addEventListener(WindowResizedEvent.class, listener);
+    public Camera getCamera() {
+        return camera;
+    }
+
+    public void setCamera(Camera camera) {
+        if (camera == null) {
+            logger.warning("Attempt to set null camera. Ignoring.");
+            return;
+        }
+
+        this.camera = camera;
+        refreshViewport();
     }
 
     public enum WindowType {

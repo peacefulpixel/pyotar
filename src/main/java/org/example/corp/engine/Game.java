@@ -39,17 +39,12 @@ public class Game {
     }
 
     private void initShaders() throws EngineException {
-        ShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DEFAULT_PROGRAM);
-        try {
-            shaderProgram.bind();
-            shaderProgram.setUniform("ortho", Window.WINDOW_DWIDTH, Window.WINDOW_DHEIGHT);
-            shaderProgram.unbind();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ShaderProgramsManager.createShaderProgram(DEFAULT_PROGRAM);
     }
 
-    private void init() throws EngineException {
+    public void init() throws EngineException {
+        logger.info("Initializing the engine");
+
         GLFWErrorCallback.createPrint(System.err).set();
         logger.fine("Error output stream has been set");
 
@@ -96,9 +91,6 @@ public class Game {
     }
 
     public void start() throws EngineException {
-        logger.info("Initializing the engine");
-        init();
-
         logger.info("Starting");
         loop();
 
