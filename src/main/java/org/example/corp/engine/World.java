@@ -12,13 +12,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class World implements Renderable, Logical {
 
-    private final List<Entity> entities;
+    protected final List<Entity> entities;
     private boolean isAutoSortingEnabled = true;
 
-    private boolean doAutoSorting = false;
+    protected boolean doAutoSorting = false;
     private boolean isEntityListFree = true;
 
-    private final Queue<Entity> entitiesToAdd = new LinkedBlockingQueue<>();
+    protected final Queue<Entity> entitiesToAdd = new LinkedBlockingQueue<>();
+    protected final Queue<Entity> entitiesToRemove = new LinkedBlockingQueue<>();
 
     public World() {
         entities = new LinkedList<>();
@@ -27,6 +28,54 @@ public class World implements Renderable, Logical {
     public void addEntity(Entity entity) {
         entitiesToAdd.add(entity);
         doAutoSorting = true;
+    }
+
+    public void removeEntity(Entity entity) {
+        entitiesToRemove.add(entity);
+    }
+
+    public void removeEntities(Class<? extends Entity> clazz) {
+        synchronized (entities) {
+            for (Entity entity : entities) {
+                if (entity.getClass().equals(clazz)) {
+                    entitiesToRemove.add(entity);
+                }
+            }
+        }
+    }
+
+    public void destroyEntities(Class<? extends Entity> clazz) {
+        synchronized (entities) {
+            for (Entity entity : entities) {
+                if (entity.getClass().equals(clazz)) {
+                    entity.destroy();
+                    entitiesToRemove.add(entity);
+                }
+            }
+        }
+    }
+
+    public void free() {
+        synchronized (entities) {
+            for (Entity entity : entities) {
+                entity.destroy();
+            }
+        }
+
+        synchronized (entitiesToAdd) {
+            for (Entity entity : entitiesToAdd) {
+                entity.destroy();
+            }
+        }
+
+        synchronized (entitiesToRemove) {
+            if (!entitiesToRemove.isEmpty()) {
+                Entity entity;
+                while ((entity = entitiesToRemove.poll()) != null) {
+                    entities.remove(entity);
+                }
+            }
+        }
     }
 
     /**
@@ -72,6 +121,14 @@ public class World implements Renderable, Logical {
 
                     if (entity instanceof Logical)
                         ((Logical) entity).init();
+                }
+            }
+        }
+        synchronized (entitiesToRemove) {
+            if (!entitiesToRemove.isEmpty()) {
+                Entity entity;
+                while ((entity = entitiesToRemove.poll()) != null) {
+                    entities.remove(entity);
                 }
             }
         }

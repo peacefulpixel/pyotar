@@ -16,9 +16,9 @@ import static org.lwjgl.opengl.GL11.*;
 //TODO: Add text drawing support
 //TODO: Gui items
 //TODO: Controls
-//TODO: Camera
 //TODO: Add shapes drawing support
 //TODO: Add audio support
+//TODO: Cursor
 public class Game {
 
     private final Logger logger = Logger.getLogger(Game.class.getName());
@@ -33,7 +33,6 @@ public class Game {
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(window.getGlfwId());
-//        window.enableVSync();
         window.putOnMiddleOfScreen();
         window.show();
     }
@@ -54,11 +53,6 @@ public class Game {
 
         initWindow();
 
-        // This line is critical for LWJGL's interoperation with GLFW's
-        // OpenGL context, or any context that is managed externally.
-        // LWJGL detects the context that is current in the current thread,
-        // creates the GLCapabilities instance and makes the OpenGL
-        // bindings available for use.
         GL.createCapabilities();
         window.initAfterSettingsContext();
 
@@ -99,6 +93,7 @@ public class Game {
     }
 
     public void free() {
+        world.free();
         glfwFreeCallbacks(window.getGlfwId());
         glfwDestroyWindow(window.getGlfwId());
         glfwTerminate();

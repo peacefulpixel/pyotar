@@ -9,4 +9,8 @@ public abstract class Entity {
     public void setWorld(World world) {
         this.world = world;
     }
+
+    public void destroy() {
+        world.removeEntity(this);
+    }
 }

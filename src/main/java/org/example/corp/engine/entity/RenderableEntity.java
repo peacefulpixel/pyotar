@@ -91,6 +91,14 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         glBindVertexArray(0);
     }
 
+    @Override
+    public void destroy() {
+        super.destroy();
+        sprite.destroy();
+        glDeleteBuffers(new int[] {vboId, eboId});
+        glDeleteVertexArrays(vaoId);
+    }
+
     public float getX() {
         return x;
     }

@@ -25,7 +25,9 @@ public class Main {
         });
 
         Window.MAIN_WINDOW.setCamera(camera);
-        world.addEntity(new InitialLogicalEntity());
+//        Window.MAIN_WINDOW.enableVSync();
+//        world.addEntity(new InitialLogicalEntity());
+        world.addEntity(new MemoryTestLogicalEntity());
 
         try {
             game.start();

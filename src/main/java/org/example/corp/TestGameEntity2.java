@@ -2,8 +2,6 @@ package org.example.corp;
 
 import org.example.corp.engine.Camera;
 import org.example.corp.engine.Window;
-import org.example.corp.engine.controls.Key;
-import org.example.corp.engine.controls.Keyboard;
 import org.example.corp.engine.entity.GameEntity;
 import org.example.corp.engine.event.EventManager;
 import org.example.corp.engine.event.impl.MouseMovedEvent;
@@ -11,8 +9,6 @@ import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
 import org.example.corp.engine.res.Image;
 import org.example.corp.engine.res.ResourceManager;
-
-import static org.example.corp.engine.GameTime.deltaTime;
 
 public class TestGameEntity2 extends GameEntity {
 

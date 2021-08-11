@@ -1,5 +1,6 @@
 package org.example.corp.engine.graphics;
 
+import org.example.corp.engine.Camera;
 import org.example.corp.engine.Window;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.res.Image;
@@ -45,7 +46,7 @@ public class Sprite {
     private Matrix4f transformation;
     private double rotation;
 
-    private int vaoId;
+    private int vaoId = 0;
 
     private final int attrTextureCords;
 
@@ -83,9 +84,12 @@ public class Sprite {
         rebuildTransformationMatrix();
     }
 
-    public void bind(int newVaoId) {
-        vaoId = newVaoId;
+    public void bind(int newVaoId) throws EngineException {
+        if (vaoId != 0) {
+            throw new EngineException("Unable to bind texture, since it's already bound. Old VAO ID: " + vaoId);
+        }
 
+        vaoId = newVaoId;
         glBindVertexArray(vaoId);
 
         textureCordsVBOId = glGenBuffers();
@@ -110,13 +114,12 @@ public class Sprite {
                 GL_UNSIGNED_BYTE, spriteBuffer);
     }
 
-    public void unbind() {
-        // glDisableVertexAttribArray(); !!!!!!!!!!!!!!!
-        glBindBuffer(GL_ARRAY_BUFFER, 0); // Mb this line is not needed
+    public void destroy() {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDeleteBuffers(textureCordsVBOId);
+        glDeleteTextures(textureId);
 
-        vaoId = 0;
-        // TODO: Delete texture cords VBO
+//        vaoId = 0;
     }
 
     public void bindTexture() {
@@ -128,8 +131,9 @@ public class Sprite {
     }
 
     public void rebuildTransformationMatrix() {
-        transformation = new Matrix4f().ortho2D(-Window.MAIN_WINDOW.getWidth(), Window.MAIN_WINDOW.getWidth(),
-                Window.MAIN_WINDOW.getHeight(), -Window.MAIN_WINDOW.getHeight()).rotateZ((float) toRadians(rotation));
+        Camera camera = Window.MAIN_WINDOW.getCamera();
+        transformation = new Matrix4f().ortho2D(-camera.getWidth(), camera.getWidth(), camera.getHeight(),
+                -camera.getHeight()).rotateZ((float) toRadians(rotation));
     }
 
     public void setAxis(float x, float y) {
