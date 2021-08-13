@@ -14,6 +14,8 @@ public class MemoryTestLogicalEntity extends LogicalEntity {
     Logger logger = LoggerUtils.getLogger(MemoryTestLogicalEntity.class);
     long instanceCounter = 0;
 
+    private InitialLogicalEntity initialLogicalEntity = new InitialLogicalEntity();
+
     @Override
     public void init() {
         EventManager.addEventListener(FpsChangedEvent.class, e -> {
@@ -33,5 +35,6 @@ public class MemoryTestLogicalEntity extends LogicalEntity {
         } catch (EngineException e) {
             e.printStackTrace();
         }
+        initialLogicalEntity.loop();
     }
 }

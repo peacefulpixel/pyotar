@@ -1,16 +1,17 @@
 package org.example.corp.engine.shader;
 
-import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.exception.EngineInitializationException;
 import org.example.corp.engine.exception.ShaderInitializationException;
 import org.example.corp.engine.res.ResourceManager;
 import org.example.corp.engine.res.Shader;
 import org.example.corp.engine.util.LoggerUtils;
+import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.lwjgl.opengl.GL20.glGetAttribLocation;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 
 public class ShaderProgramsManager {
 
@@ -19,6 +20,8 @@ public class ShaderProgramsManager {
     private static final Map<String, ShaderProgram> shaderPrograms = new HashMap<>();
     private static String shaderDir = "res/shaders/";
     public static final String DEFAULT_PROGRAM = "default";
+
+    private static int boundProgram = 0;
 
     public static void setShaderDir(String path) {
         shaderDir = path;
@@ -45,16 +48,44 @@ public class ShaderProgramsManager {
     public static ShaderProgram getShaderProgram(String name) throws ShaderInitializationException {
         ShaderProgram program;
         if ((program = shaderPrograms.get(name)) == null) {
-            if ((program = shaderPrograms.get(DEFAULT_PROGRAM)) == null) {
-                logger.info("Initializing default shader program");
-                return createShaderProgram(DEFAULT_PROGRAM);
-            }
+            return createShaderProgram(name);
         }
 
         return program;
     }
 
-    public static ShaderProgram getDefaultProgram() throws ShaderInitializationException {
-        return getShaderProgram(DEFAULT_PROGRAM);
+    private static int bind(int id) {
+        int oldProgram = boundProgram;
+        if (boundProgram != id) {
+            boundProgram = id;
+            glUseProgram(boundProgram);
+        }
+
+        return oldProgram;
+    }
+
+    protected synchronized static void bindAndPerform(ShaderProgram program, ShaderProgramAction action) {
+        int oldId = bind(program.id);
+        action.perform(program);
+        bind(oldId);
+    }
+
+    protected synchronized static int getAttribute(ShaderProgram program, String attribute) {
+        int oldId = bind(program.id);
+        int attrId = glGetAttribLocation(program.id, attribute);
+        bind(oldId);
+        return attrId;
+    }
+
+    public synchronized static void bindAndPerform(ShaderProgramAction action) {
+        for (ShaderProgram program : shaderPrograms.values()) {
+            action.perform(program);
+        }
+    }
+
+    public static void free() {
+        for (ShaderProgram program : shaderPrograms.values()) {
+            program.free();
+        }
     }
 }

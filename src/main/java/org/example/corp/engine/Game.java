@@ -62,9 +62,6 @@ public class Game {
     }
 
     private void loop() throws EngineException {
-        ShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DEFAULT_PROGRAM);
-        shaderProgram.bind();
-
         while (!window.isShouldClose()) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -76,8 +73,6 @@ public class Game {
 
             GameTime.refreshDelta();
         }
-
-        shaderProgram.unbind();
     }
 
     public Game(World world) {
@@ -94,6 +89,7 @@ public class Game {
 
     public void free() {
         world.free();
+        ShaderProgramsManager.free();
         glfwFreeCallbacks(window.getGlfwId());
         glfwDestroyWindow(window.getGlfwId());
         glfwTerminate();

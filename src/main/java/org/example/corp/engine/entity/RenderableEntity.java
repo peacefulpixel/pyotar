@@ -6,6 +6,7 @@ import org.example.corp.engine.shader.ShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.example.corp.engine.util.BufferUtils;
 
+import static org.example.corp.engine.shader.ShaderProgramsManager.DEFAULT_PROGRAM;
 import static org.lwjgl.opengl.GL30.*;
 
 public abstract class RenderableEntity extends Entity implements Renderable {
@@ -28,12 +29,11 @@ public abstract class RenderableEntity extends Entity implements Renderable {
     private final int attrBounds;
     private final int attrTextureCords;
 
-    private ShaderProgram shaderProgram;
+    private ShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DEFAULT_PROGRAM);
 
     public RenderableEntity(Sprite sprite) throws EngineException {
         this.sprite = sprite;
 
-        shaderProgram = ShaderProgramsManager.getDefaultProgram();
         attrBounds = shaderProgram.getAttribute("bounds");
         attrTextureCords = shaderProgram.getAttribute("texture_cords");
 
@@ -52,7 +52,7 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         glBindVertexArray(0);
     }
 
-    private void refreshVertexArray() {
+    private synchronized void refreshVertexArray() {
         float axisX  = sprite.getAxisX();
         float axisY  = sprite.getAxisY();
         float width  = sprite.getWidth();
@@ -72,19 +72,17 @@ public abstract class RenderableEntity extends Entity implements Renderable {
     }
 
     @Override
-    public void render() {
+    public synchronized void render() {
         glBindVertexArray(vaoId);
         glEnableVertexAttribArray(attrBounds);
         glEnableVertexAttribArray(attrTextureCords);
 
-        shaderProgram.bind();
-
         shaderProgram.setUniform("position", x, y);
         shaderProgram.setUniform("depth", -depth);
-        sprite.bindTexture();
-        glDrawElements(GL_TRIANGLES, elementsArray.length, GL_UNSIGNED_INT, 0);
-
-        shaderProgram.unbind();
+        shaderProgram.bindAndPerform(p -> {
+            sprite.bindTexture();
+            glDrawElements(GL_TRIANGLES, elementsArray.length, GL_UNSIGNED_INT, 0);
+        });
 
         glDisableVertexAttribArray(attrBounds);
         glDisableVertexAttribArray(attrTextureCords);
@@ -127,7 +125,8 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         return sprite;
     }
 
-    public void setSprite(Sprite sprite) {
+    public synchronized void setSprite(Sprite sprite) {
+        this.sprite.destroy();
         this.sprite = sprite;
         refreshVertexArray();
     }

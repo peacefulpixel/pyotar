@@ -10,6 +10,7 @@ import org.example.corp.engine.event.impl.*;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.exception.ShaderInitializationException;
 import org.example.corp.engine.exception.WindowInitializationException;
+import org.example.corp.engine.shader.ShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.example.corp.engine.util.LoggerUtils;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -157,14 +158,10 @@ public class Window {
         });
     }
 
-    public void refreshViewport(float width, float height, double aspect) {
+    public synchronized void refreshViewport(float width, float height, double aspect) {
         glViewport(0, 0, (int) width, (int) height);
         glOrtho(-aspect/2, aspect/2, -1, 1, -1, 1);
-        try {
-            ShaderProgramsManager.getDefaultProgram().setUniform("ortho", width/2, height/2);
-        } catch (ShaderInitializationException e) {
-            logger.log(Level.SEVERE, "Unable to set uniform", e);
-        }
+        ShaderProgramsManager.bindAndPerform(program -> program.setUniform("ortho", width/2, height/2));
     }
 
     public void refreshViewport() {

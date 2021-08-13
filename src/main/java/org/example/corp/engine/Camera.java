@@ -39,11 +39,7 @@ public class Camera {
     }
 
     private void onMove() {
-        try {
-            ShaderProgramsManager.getDefaultProgram().setUniform("camera_position", x, y);
-        } catch (ShaderInitializationException e) {
-            logger.log(Level.WARNING, "Unable to refresh camera_position uniform", e);
-        }
+        ShaderProgramsManager.bindAndPerform(program -> program.setUniform("camera_position", x, y));
     }
 
     public float getX() {

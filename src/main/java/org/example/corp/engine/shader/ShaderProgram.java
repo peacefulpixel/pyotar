@@ -17,19 +17,19 @@ public class ShaderProgram {
 
     private static final Logger logger = LoggerUtils.getLogger(ShaderProgram.class);
 
-    private final int programId;
+    protected final int id;
 
     private int vertexShaderId;
     private int fragmentShaderId;
 
     private boolean isBound = false;
 
-    Map<String, Integer> uniforms = new HashMap<>();
+    Map<String, Integer> uniformsCache = new HashMap<>();
 
-    public ShaderProgram() throws ShaderInitializationException {
-        programId = glCreateProgram();
-        if (programId == 0) {
-            throw new ShaderInitializationException("Unable to create shader program " + programId);
+    protected ShaderProgram() throws ShaderInitializationException {
+        id = glCreateProgram();
+        if (id == 0) {
+            throw new ShaderInitializationException("Unable to create shader program " + id);
         }
     }
 
@@ -54,16 +54,16 @@ public class ShaderProgram {
             throw new ShaderInitializationException("Error compiling Shader code: " + glGetShaderInfoLog(shaderId, 1024));
         }
 
-        glAttachShader(programId, shaderId);
+        glAttachShader(id, shaderId);
 
         return shaderId;
     }
 
-    public void link() throws ShaderInitializationException {
-        glLinkProgram(programId);
-        if (glGetProgrami(programId, GL_LINK_STATUS) == 0) {
+    protected void link() throws ShaderInitializationException {
+        glLinkProgram(id);
+        if (glGetProgrami(id, GL_LINK_STATUS) == 0) {
             throw new ShaderInitializationException("Error linking Shader code: " +
-                    glGetProgramInfoLog(programId, 1024));
+                    glGetProgramInfoLog(id, 1024));
         }
 
 //        if (vertexShaderId != 0) {
@@ -73,43 +73,26 @@ public class ShaderProgram {
 //            glDetachShader(programId, fragmentShaderId);
 //        }
 
-        glValidateProgram(programId);
-        if (glGetProgrami(programId, GL_VALIDATE_STATUS) == 0) {
-            System.err.println("Warning validating Shader code: " + glGetProgramInfoLog(programId, 1024));
+        glValidateProgram(id);
+        if (glGetProgrami(id, GL_VALIDATE_STATUS) == 0) {
+            System.err.println("Warning validating Shader code: " + glGetProgramInfoLog(id, 1024));
         }
 
     }
 
     public int getAttribute(String name) {
-        final boolean wasBound = isBound;
-        if (!isBound) bind();
-
-        int attrId = glGetAttribLocation(programId, name);
-
-        if (!wasBound) unbind();
-
-        return attrId;
+        return ShaderProgramsManager.getAttribute(this, name);
     }
 
-    public void bind() {
-        glUseProgram(programId);
-        isBound = true;
-    }
-
-    public void unbind() {
-        glUseProgram(0);
-        isBound = false;
-    }
-
-    public void createUniform(String uniformName) {
-        int uniformLocation = glGetUniformLocation(programId, uniformName);
+    protected void createUniform(String uniformName) {
+        int uniformLocation = glGetUniformLocation(id, uniformName);
         if (uniformLocation < 0) {
             logger.warning("Unable to create uniform. Apparently, it's not declared in shader program or was" +
                     "removed by OpenGL shader compiler for optimization. uniformName=" + uniformName +
-                    "shaderProgramId=" + programId);
+                    "shaderProgramId=" + id);
             return;
         }
-        uniforms.put(uniformName, uniformLocation);
+        uniformsCache.put(uniformName, uniformLocation);
     }
 
     public void setUniform(String uniform, Vector3f value) {
@@ -149,34 +132,35 @@ public class ShaderProgram {
     }
 
     private void performSafeUniformAction(String uniform, UniformAction action) {
-        Integer location = uniforms.get(uniform);
+        Integer location = uniformsCache.get(uniform);
         if (location == null) {
             createUniform(uniform);
-            location = uniforms.get(uniform);
+            location = uniformsCache.get(uniform);
             if (location == null) {
-                logger.warning("Skipping action from uniform " + uniform);
+                logger.warning("Skipping action for uniform " + uniform);
                 return;
             }
         }
 
-        boolean wasBound = isBound;
-        if (!isBound) bind();
+        Integer finalLocation = location; // wtf btw
+        bindAndPerform(program -> action.perform(finalLocation));
+    }
 
-        action.act(location);
-
-        if (!wasBound) unbind();
+    public void bindAndPerform(ShaderProgramAction action) {
+        ShaderProgramsManager.bindAndPerform(this, action);
     }
 
     public void free() {
-        unbind();
-        if (programId != 0) {
-            glDeleteShader(vertexShaderId);
-            glDeleteShader(fragmentShaderId);
-            glDeleteProgram(programId);
+        if (id != 0) {
+            bindAndPerform(program -> {
+                glDeleteShader(vertexShaderId);
+                glDeleteShader(fragmentShaderId);
+                glDeleteProgram(id);
+            });
         }
     }
 
     private interface UniformAction {
-        void act(int location);
+        void perform(Integer location);
     }
 }
