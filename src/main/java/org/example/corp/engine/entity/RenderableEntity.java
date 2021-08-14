@@ -1,5 +1,7 @@
 package org.example.corp.engine.entity;
 
+import org.example.corp.engine.Camera;
+import org.example.corp.engine.Window;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
 import org.example.corp.engine.shader.ShaderProgram;
@@ -71,8 +73,19 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         BufferUtils.glBufferData(GL_ARRAY_BUFFER, vertexArray, GL_STATIC_DRAW);
     }
 
+    private boolean shouldBeRendered() {
+        Camera camera = Window.MAIN_WINDOW.getCamera();
+        boolean tl = camera.isPointVisible(vertexArray[0] + x, vertexArray[1] + y);
+        boolean tr = camera.isPointVisible(vertexArray[2] + x, vertexArray[3] + y);
+        boolean br = camera.isPointVisible(vertexArray[4] + x, vertexArray[5] + y);
+        boolean bl = camera.isPointVisible(vertexArray[6] + x, vertexArray[7] + y);
+        return tl || tr || br || bl;
+    }
+
     @Override
     public synchronized void render() {
+        if (!shouldBeRendered()) return;
+
         glBindVertexArray(vaoId);
         glEnableVertexAttribArray(attrBounds);
         glEnableVertexAttribArray(attrTextureCords);

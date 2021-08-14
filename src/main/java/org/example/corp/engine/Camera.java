@@ -33,6 +33,13 @@ public class Camera {
         aspect = width / height;
     }
 
+    public boolean isPointVisible(float x, float y) {
+        float camX = this.x - (width / 2);
+        float camY = this.y - (height / 2);
+
+        return !(x > camX + width) && !(x < camX) && !(y > camY + height) && !(y < camY);
+    }
+
     private void onResize() {
         refreshAspect();
         Window.MAIN_WINDOW.refreshViewport();

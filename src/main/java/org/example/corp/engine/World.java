@@ -5,10 +5,7 @@ import org.example.corp.engine.entity.Logical;
 import org.example.corp.engine.entity.Renderable;
 import org.example.corp.engine.entity.RenderableEntity;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,6 +28,11 @@ public class World implements Renderable, Logical {
 
     public void addEntity(Entity entity) {
         entitiesToAdd.add(entity);
+        doAutoSorting = true;
+    }
+
+    public void addEntities(Entity... entities) {
+        entitiesToAdd.addAll(Arrays.asList(entities));
         doAutoSorting = true;
     }
 
