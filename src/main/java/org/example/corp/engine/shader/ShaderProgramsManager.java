@@ -48,7 +48,7 @@ public class ShaderProgramsManager {
     public static ShaderProgram getShaderProgram(String name) throws ShaderInitializationException {
         ShaderProgram program;
         if ((program = shaderPrograms.get(name)) == null) {
-            return createShaderProgram(name);
+            throw new ShaderInitializationException("Shader " + name + " is not initialized");
         }
 
         return program;
@@ -56,7 +56,7 @@ public class ShaderProgramsManager {
 
     private static int bind(int id) {
         int oldProgram = boundProgram;
-        if (boundProgram != id) {
+        if (boundProgram != id && id != 0) {
             boundProgram = id;
             glUseProgram(boundProgram);
         }

@@ -5,10 +5,13 @@ import org.example.corp.engine.entity.Logical;
 import org.example.corp.engine.entity.Renderable;
 import org.example.corp.engine.entity.RenderableEntity;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class World implements Renderable, Logical {
 
@@ -16,10 +19,11 @@ public class World implements Renderable, Logical {
     private boolean isAutoSortingEnabled = true;
 
     protected boolean doAutoSorting = false;
-    private boolean isEntityListFree = true;
 
     protected final Queue<Entity> entitiesToAdd = new LinkedBlockingQueue<>();
     protected final Queue<Entity> entitiesToRemove = new LinkedBlockingQueue<>();
+
+    public static final float DEPTH_STEP = 1e-8f;
 
     public World() {
         entities = new LinkedList<>();
@@ -86,12 +90,22 @@ public class World implements Renderable, Logical {
      * You may disable auto-sorting with {@link World#setAutoSortingEnabled(boolean)} method, but make sure you
      * understand the issues it might cause.
      */
-    public void sortByDepth() {
-        entities.sort((a, b) -> {
-            float aDepth = a instanceof RenderableEntity ? ((RenderableEntity) a).getDepth() : .0f;
-            float bDepth = b instanceof RenderableEntity ? ((RenderableEntity) b).getDepth() : .0f;
-            return Float.compare(aDepth, bDepth);
-        });
+    public void sortEntities() {
+        entities.sort(Entity::compareTo);
+    }
+
+    public synchronized float nextTopDepth() {
+        List<Entity> allEntities =
+                Stream.concat(entities.stream(), entitiesToAdd.stream()).filter(e -> e instanceof RenderableEntity)
+                .sorted((a, b) -> Float.compare(((RenderableEntity) a).getDepth(), ((RenderableEntity) b).getDepth()))
+                .collect(Collectors.toList());
+
+        if (allEntities.isEmpty()) {
+            return 0.0f;
+        } else {
+            Entity entity = allEntities.get(allEntities.size() - 1);
+            return ((RenderableEntity) entity).getDepth() + DEPTH_STEP;
+        }
     }
 
     @Override
@@ -139,7 +153,7 @@ public class World implements Renderable, Logical {
         synchronized (entities) {
             if (isAutoSortingEnabled && doAutoSorting) {
                 doAutoSorting = false;
-                sortByDepth();
+                sortEntities();
             }
 
             for (Entity entity : entities) {

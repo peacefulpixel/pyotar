@@ -1,7 +1,6 @@
 package org.example.corp.engine;
 
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.shader.ShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -12,6 +11,8 @@ import static org.example.corp.engine.shader.ShaderProgramsManager.DEFAULT_PROGR
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 //TODO: Add text drawing support
 //TODO: Gui items
@@ -57,6 +58,7 @@ public class Game {
         window.initAfterSettingsContext();
 
         initShaders();
+        glActiveTexture(GL_TEXTURE0);
 
         world.init();
     }

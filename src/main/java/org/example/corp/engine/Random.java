@@ -11,6 +11,11 @@ public class Random {
         return random.nextLong();
     }
 
+    public static long genUnsigned() {
+        long l = gen();
+        return l < 0 ? -l : l;
+    }
+
     public static long gen(long seed) {
         java.util.Random random;
         if ((random = randoms.get(seed)) == null) {
@@ -19,5 +24,10 @@ public class Random {
         }
 
         return random.nextLong();
+    }
+
+    public static long genUnsigned(long seed) {
+        long l = gen(seed);
+        return l < 0 ? -l : l;
     }
 }

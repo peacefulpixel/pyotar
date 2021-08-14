@@ -130,4 +130,15 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         this.sprite = sprite;
         refreshVertexArray();
     }
+
+    @Override
+    public int compareTo(Entity o) {
+        if (o instanceof RenderableEntity) {
+            int depthComp = Float.compare(depth, ((RenderableEntity) o).depth);
+            int sprComp = sprite.compareTo(((RenderableEntity) o).sprite);
+            return depthComp == 0 ? sprComp : depthComp;
+        }
+
+        return super.compareTo(o);
+    }
 }

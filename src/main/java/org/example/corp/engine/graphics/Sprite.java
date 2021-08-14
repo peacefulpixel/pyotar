@@ -20,7 +20,7 @@ import static java.lang.Math.toRadians;
 import static org.example.corp.engine.shader.ShaderProgramsManager.DEFAULT_PROGRAM;
 import static org.lwjgl.opengl.GL30.*;
 
-public class Sprite {
+public class Sprite implements Comparable<Sprite> {
 
     private final Logger logger = LoggerUtils.getLogger(Sprite.class);
 
@@ -31,9 +31,9 @@ public class Sprite {
             0.0f, 1.0f,  // Bottom-left
     };
 
-    private final ByteBuffer spriteBuffer;
+    private Texture texture;
     private int textureCordsVBOId = 0;
-    private int textureId = 0;
+    private int vaoId = 0;
 
     public final int spriteOriginalWidth;
     public final int spriteOriginalHeight;
@@ -46,31 +46,28 @@ public class Sprite {
     private Matrix4f transformation;
     private double rotation;
 
-    private int vaoId = 0;
-
     private final int attrTextureCords;
 
     private ShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DEFAULT_PROGRAM);
 
     /**
-     * @see Sprite#Sprite(Image, float)
+     * @see Sprite#Sprite(Texture, float)
      */
-    public Sprite(Image image) throws EngineException {
-        this(image, 4.0f);
+    public Sprite(Texture texture) throws EngineException {
+        this(texture, 4.0f);
     }
 
     /**
      * Constructor
-     * @param image PNG image resource file (RGBA, 8bit)
+     * @param texture PNG image resource file (RGBA, 8bit)
      * @param scaling Texture scaling (4x by default)
      */
-    public Sprite(Image image, float scaling) throws EngineException {
-        spriteBuffer = image.getDecodedImage();
-
+    public Sprite(Texture texture, float scaling) throws EngineException {
+        this.texture = texture;
         color = new Vector3f(1.0f, 1.0f, 1.0f);
 
-        spriteOriginalWidth  = image.getWidth();
-        spriteOriginalHeight = image.getHeight();
+        spriteOriginalWidth  = texture.width;
+        spriteOriginalHeight = texture.height;
 
         width  = spriteOriginalWidth  * scaling;
         height = spriteOriginalHeight * scaling;
@@ -98,33 +95,18 @@ public class Sprite {
         glVertexAttribPointer(attrTextureCords, 2, GL_FLOAT, false, 0, 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        textureId = glGenTextures();
-        bindTexture();
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//        float[] color = { 1.0f, 1.0f, 1.0f, 0.0f };
-//        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, spriteOriginalWidth, spriteOriginalHeight, 0, GL_RGBA,
-                GL_UNSIGNED_BYTE, spriteBuffer);
     }
 
     public void destroy() {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDeleteBuffers(textureCordsVBOId);
-        glDeleteTextures(textureId);
+        texture.destroy();
 
 //        vaoId = 0;
     }
 
     public void bindTexture() {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureId);
+        texture.bindTexture();
         shaderProgram.setUniform("texture_2d", 0);
         shaderProgram.setUniform("texture_color", color);
         shaderProgram.setUniform("transformation", transformation);
@@ -173,5 +155,10 @@ public class Sprite {
 
     public float getAxisY() {
         return axisY;
+    }
+
+    @Override
+    public int compareTo(Sprite o) {
+        return texture.compareTo(o.texture);
     }
 }

@@ -19,15 +19,11 @@ public class MemoryTestLogicalEntity extends LogicalEntity {
     @Override
     public void init() {
         EventManager.addEventListener(FpsChangedEvent.class, e -> {
-            System.out.printf("FPS: %4d INSTANCES: %d\n", e.newFps, instanceCounter);
+            logger.info("FPS: " + e.newFps + " INSTANCES: " + instanceCounter);
         });
-    }
 
-    @Override
-    public void loop() {
         try {
-            world.destroyEntities(TestGameEntity.class);
-            for (int x = 0; x < 10; x++) {
+            for (int x = 0; x < 2000; x++) {
                 Entity entity = new TestGameEntity();
                 world.addEntity(entity);
                 instanceCounter++;
@@ -35,6 +31,20 @@ public class MemoryTestLogicalEntity extends LogicalEntity {
         } catch (EngineException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void loop() {
+//        try {
+//            world.destroyEntities(TestGameEntity.class);
+//            for (int x = 0; x < 10; x++) {
+//                Entity entity = new TestGameEntity();
+//                world.addEntity(entity);
+//                instanceCounter++;
+//            }
+//        } catch (EngineException e) {
+//            e.printStackTrace();
+//        }
         initialLogicalEntity.loop();
     }
 }

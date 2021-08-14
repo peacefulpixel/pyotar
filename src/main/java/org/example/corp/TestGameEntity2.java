@@ -7,6 +7,7 @@ import org.example.corp.engine.event.EventManager;
 import org.example.corp.engine.event.impl.MouseMovedEvent;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
+import org.example.corp.engine.graphics.Texture;
 import org.example.corp.engine.res.Image;
 import org.example.corp.engine.res.ResourceManager;
 
@@ -15,7 +16,7 @@ public class TestGameEntity2 extends GameEntity {
     private final float movSpeed = 240.0f;
 
     public TestGameEntity2() throws EngineException {
-        super(new Sprite(ResourceManager.get(Image.class, "nowhere.png")));
+        super(new Sprite(new Texture(ResourceManager.get(Image.class, "nowhere.png"))));
     }
 
     @Override
