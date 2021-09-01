@@ -1,5 +1,6 @@
 package org.example.corp.engine.entity;
 
+import org.example.corp.engine.base.Logical;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
 

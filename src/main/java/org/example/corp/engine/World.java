@@ -1,8 +1,8 @@
 package org.example.corp.engine;
 
 import org.example.corp.engine.entity.Entity;
-import org.example.corp.engine.entity.Logical;
-import org.example.corp.engine.entity.Renderable;
+import org.example.corp.engine.base.Logical;
+import org.example.corp.engine.base.Renderable;
 import org.example.corp.engine.entity.RenderableEntity;
 
 import java.util.*;

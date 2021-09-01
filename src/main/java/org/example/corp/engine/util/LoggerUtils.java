@@ -3,7 +3,8 @@ package org.example.corp.engine.util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.*;
 import java.util.stream.Collectors;
@@ -32,7 +33,6 @@ public class LoggerUtils {
         if (isFileLoggingEnabled) {
             if (handler == null) {
                 File dir = new File(logDir);
-                nonFileLogger.info("Logging directory: " + dir.getAbsolutePath());
                 if (!dir.exists()) {
                     if (!dir.mkdir()) {
                         nonFileLogger.warning("Unable to create dir " + logDir);
@@ -46,18 +46,14 @@ public class LoggerUtils {
                     }
                 }
                 try {
-                    List<Path> logs = Files.list(dir.toPath()).filter(p -> !Files.isDirectory(p)).sorted().collect(Collectors.toList());
-                    System.out.println("LOG SIZE" + logs.size());
-                    if (logs.isEmpty()) {
+                    List<Integer> logNumbers = Files.list(dir.toPath()).filter(p -> !Files.isDirectory(p))
+                            .map(p -> Integer.parseUnsignedInt(new LinkedList<>(
+                                    Arrays.asList(p.toString().split("\\."))
+                            ).getLast())).sorted().collect(Collectors.toList()); // Is it even worth xD?
+                    if (logNumbers.isEmpty()) {
                         createFileHandler(logDir + logName + ".0");
                     } else {
-                        String lastLogName = logs.get(logs.size() - 1).getFileName().toString();
-                        String[] separatedName = lastLogName.split("\\.");
-                        if (separatedName.length != 2) {
-                            logger.warning("Incorrect name of last log file: " + lastLogName);
-                            return logger;
-                        }
-                        int logNumber = Integer.parseUnsignedInt(separatedName[1]) + 1;
+                        int logNumber = logNumbers.get(logNumbers.size() - 1) + 1;
                         createFileHandler(logDir + logName + "." + logNumber);
                     }
                 } catch (IOException e) {

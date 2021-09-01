@@ -2,16 +2,15 @@ package org.example.corp.engine.entity;
 
 import org.example.corp.engine.Camera;
 import org.example.corp.engine.Window;
+import org.example.corp.engine.base.Renderable;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
 import org.example.corp.engine.shader.DefaultShaderProgram;
-import org.example.corp.engine.shader.ShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.example.corp.engine.util.BufferUtils;
 
 import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_BOUNDS;
 import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_TEXTURE_CORDS;
-import static org.example.corp.engine.shader.ShaderProgramsManager.DEFAULT_PROGRAM;
 import static org.lwjgl.opengl.GL30.*;
 
 public abstract class RenderableEntity extends Entity implements Renderable {
