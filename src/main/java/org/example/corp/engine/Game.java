@@ -21,6 +21,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 //TODO: Add shapes drawing support
 //TODO: Add audio support
 //TODO: Cursor
+//TODO: Animations
 public class Game {
 
     private final Logger logger = Logger.getLogger(Game.class.getName());

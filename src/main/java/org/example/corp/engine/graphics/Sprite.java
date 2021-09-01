@@ -79,20 +79,12 @@ public class Sprite implements Comparable<Sprite> {
         rebuildTransformationMatrix();
     }
 
-    public void bind(int newVaoId) throws EngineException {
+    public void bind(VaoVertexArray vertexArray) throws EngineException {
         if (vaoId != 0) {
             throw new EngineException("Unable to bind texture, since it's already bound. Old VAO ID: " + vaoId);
         }
 
-        vaoId = newVaoId;
-        glBindVertexArray(vaoId);
-
-        textureCordsVBOId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, textureCordsVBOId);
-        BufferUtils.glBufferData(GL_ARRAY_BUFFER, textureCords, GL_STATIC_DRAW);
-        glVertexAttribPointer(ATTR_TEXTURE_CORDS.getId(), 2, GL_FLOAT, false, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        vertexArray.addBuffer(ATTR_TEXTURE_CORDS, textureCords);
     }
 
     public void destroy() {

@@ -33,7 +33,7 @@ public class TestGameEntity extends GameEntity {
     }
 
     public TestGameEntity() throws EngineException {
-        super(new Sprite(getRandomTexture()));
+        super(new Sprite(getRandomTexture(), 0.1f * (Random.gen() % 40)));
         moveX = Random.genUnsigned() % 2 == 1;
         movSpeed = Random.gen() % 120;
         rotationSpeed = Random.gen() % 90;

@@ -5,6 +5,8 @@ import org.example.corp.engine.Window;
 import org.example.corp.engine.base.Renderable;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
+import org.example.corp.engine.graphics.VaoVertexArray;
+import org.example.corp.engine.graphics.VertexArray;
 import org.example.corp.engine.shader.DefaultShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.example.corp.engine.util.BufferUtils;
@@ -19,35 +21,23 @@ public abstract class RenderableEntity extends Entity implements Renderable {
             0, 1, 2, 2, 3, 0,
     }; // Basic square
 
-    private final int vaoId;
-    private final int vboId;
-    private final int eboId;
-
     private Sprite sprite;
     private float x = 0.0f;
     private float y = 0.0f;
     private float depth = 0.0f;
 
     private float[] vertexArray;
+    private VaoVertexArray vertices;
 
     private DefaultShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DefaultShaderProgram.class);
 
     public RenderableEntity(Sprite sprite) throws EngineException {
         this.sprite = sprite;
 
-        vaoId = glGenVertexArrays();
-        glBindVertexArray(vaoId);
-
-        vboId = glGenBuffers();
         refreshVertexArray();
-        glVertexAttribPointer(ATTR_BOUNDS.getId(), 2, GL_FLOAT, false, 0, 0);
+        vertices = new VaoVertexArray(ATTR_BOUNDS, vertexArray, elementsArray);
 
-        eboId = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
-        BufferUtils.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementsArray, GL_STATIC_DRAW);
-
-        sprite.bind(vaoId);
-        glBindVertexArray(0);
+        sprite.bind(vertices);
     }
 
     private synchronized void refreshVertexArray() {
@@ -65,8 +55,9 @@ public abstract class RenderableEntity extends Entity implements Renderable {
                  0.0f - axisX,   0.0f - axisY, // Bottom-left
         };
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboId);
-        BufferUtils.glBufferData(GL_ARRAY_BUFFER, vertexArray, GL_STATIC_DRAW);
+        if (vertices != null) {
+            vertices.setVertices(vertexArray);
+        }
     }
 
     private boolean shouldBeRendered() {
@@ -82,9 +73,9 @@ public abstract class RenderableEntity extends Entity implements Renderable {
     public synchronized void render() {
         if (!shouldBeRendered()) return;
 
-        glBindVertexArray(vaoId);
-        glEnableVertexAttribArray(ATTR_BOUNDS.getId());
-        glEnableVertexAttribArray(ATTR_TEXTURE_CORDS.getId());
+        vertices.bind();
+        ATTR_BOUNDS.enable();
+        ATTR_TEXTURE_CORDS.enable();
 
         shaderProgram.setPosition(x, y);
         shaderProgram.setDepth(-depth);
@@ -93,17 +84,16 @@ public abstract class RenderableEntity extends Entity implements Renderable {
             glDrawElements(GL_TRIANGLES, elementsArray.length, GL_UNSIGNED_INT, 0);
         });
 
-        glDisableVertexAttribArray(ATTR_BOUNDS.getId());
-        glDisableVertexAttribArray(ATTR_TEXTURE_CORDS.getId());
-        glBindVertexArray(0);
+        ATTR_BOUNDS.disable();
+        ATTR_TEXTURE_CORDS.disable();
+        vertices.unbind();
     }
 
     @Override
     public void destroy() {
         super.destroy();
         sprite.destroy();
-        glDeleteBuffers(new int[] {vboId, eboId});
-        glDeleteVertexArrays(vaoId);
+        vertices.destroy();
     }
 
     public float getX() {
