@@ -5,6 +5,7 @@ import org.example.corp.engine.Window;
 import org.example.corp.engine.base.Renderable;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
+import org.example.corp.engine.graphics.Texture;
 import org.example.corp.engine.graphics.VaoVertexArray;
 import org.example.corp.engine.graphics.VertexArray;
 import org.example.corp.engine.shader.DefaultShaderProgram;
@@ -79,9 +80,12 @@ public abstract class RenderableEntity extends Entity implements Renderable {
 
         shaderProgram.setPosition(x, y);
         shaderProgram.setDepth(-depth);
+        sprite.setUniforms();
         shaderProgram.bindAndPerform(p -> {
-            sprite.bindTexture();
-            glDrawElements(GL_TRIANGLES, elementsArray.length, GL_UNSIGNED_INT, 0);
+            for (Texture texture : sprite.getTextures()) {
+                texture.bindTexture();
+                glDrawElements(GL_TRIANGLES, elementsArray.length, GL_UNSIGNED_INT, 0);
+            }
         });
 
         ATTR_BOUNDS.disable();

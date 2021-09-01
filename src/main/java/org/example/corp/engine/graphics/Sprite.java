@@ -2,6 +2,7 @@ package org.example.corp.engine.graphics;
 
 import org.example.corp.engine.Camera;
 import org.example.corp.engine.Window;
+import org.example.corp.engine.base.Destroyable;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.res.Image;
 import org.example.corp.engine.shader.DefaultShaderProgram;
@@ -11,18 +12,21 @@ import org.example.corp.engine.util.BufferUtils;
 import org.example.corp.engine.util.LoggerUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.lang.Math.toRadians;
+import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_BOUNDS;
 import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_TEXTURE_CORDS;
 import static org.example.corp.engine.shader.ShaderProgramsManager.DEFAULT_PROGRAM;
 import static org.lwjgl.opengl.GL30.*;
 
-public class Sprite implements Comparable<Sprite> {
+public class Sprite implements Comparable<Sprite>, Destroyable {
 
     private final Logger logger = LoggerUtils.getLogger(Sprite.class);
 
@@ -33,7 +37,9 @@ public class Sprite implements Comparable<Sprite> {
             0.0f, 1.0f,  // Bottom-left
     };
 
-    private Texture texture;
+    private FloatBuffer textureCordsBuffer = null; // TODO: Could be static so will eat less memory
+
+    private Texture[] textures;
     private int textureCordsVBOId = 0;
     private int vaoId = 0;
 
@@ -51,23 +57,27 @@ public class Sprite implements Comparable<Sprite> {
     private DefaultShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DefaultShaderProgram.class);
 
     /**
-     * @see Sprite#Sprite(Texture, float)
+     * @see Sprite#Sprite(float, Texture...)
      */
-    public Sprite(Texture texture) throws EngineException {
-        this(texture, 4.0f);
+    public Sprite(Texture ...textures) throws EngineException {
+        this(4.0f, textures);
     }
 
     /**
      * Constructor
-     * @param texture PNG image resource file (RGBA, 8bit)
+     * @param textures Textures?
      * @param scaling Texture scaling (4x by default)
      */
-    public Sprite(Texture texture, float scaling) throws EngineException {
-        this.texture = texture;
+    public Sprite(float scaling, Texture ...textures) throws EngineException {
+        if (textures.length < 1) {
+            throw new EngineException("Unable to initialize sprite without any texture");
+        }
+
+        this.textures = textures;
         color = new Vector3f(1.0f, 1.0f, 1.0f);
 
-        spriteOriginalWidth  = texture.width;
-        spriteOriginalHeight = texture.height;
+        spriteOriginalWidth  = textures[0].width;
+        spriteOriginalHeight = textures[0].height;
 
         width  = spriteOriginalWidth  * scaling;
         height = spriteOriginalHeight * scaling;
@@ -87,18 +97,32 @@ public class Sprite implements Comparable<Sprite> {
         vertexArray.addBuffer(ATTR_TEXTURE_CORDS, textureCords);
     }
 
+    @Override
     public void destroy() {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDeleteBuffers(textureCordsVBOId);
-        texture.destroy();
+        for (Texture texture : textures) {
+            texture.destroy();
+        }
 
 //        vaoId = 0;
     }
+    /**
+     * Bind buffers as attributes.
+     * Could be used when sprite was not bound with VAO
+     */
+    public void bindBuffers() {
+        if (textureCordsBuffer == null) {
+            textureCordsBuffer = MemoryUtil.memAllocFloat(8);
+            textureCordsBuffer.put(textureCords).flip();
+        }
+        glVertexAttribPointer(ATTR_BOUNDS.getId(), 2, GL_FLOAT, false, 0, textureCordsBuffer);
+    }
 
-    public void bindTexture() {
-        texture.bindTexture();
+
+    public void setUniforms() {
         shaderProgram.setTexture2d(0);
-        shaderProgram.setTextureColor(color.x, color.y, color.z);
+        shaderProgram.setTextureColor(color.x, color.y, color.z); // TODO: ?
         shaderProgram.setTransformation(transformation);
     }
 
@@ -147,8 +171,14 @@ public class Sprite implements Comparable<Sprite> {
         return axisY;
     }
 
+    public Texture[] getTextures() {
+        return textures;
+    }
+
     @Override
     public int compareTo(Sprite o) {
-        return texture.compareTo(o.texture);
+        // TODO: It's not work when sprite have multiple textures
+//        return texture.compareTo(o.texture);
+        return 0;
     }
 }
