@@ -46,7 +46,7 @@ public class Camera {
     }
 
     private void onMove() {
-        ShaderProgramsManager.bindAndPerform(program -> program.setUniform("camera_position", x, y));
+        ShaderProgramsManager.bindAndPerform(program -> program.setCameraPosition(x, y));
     }
 
     public float getX() {

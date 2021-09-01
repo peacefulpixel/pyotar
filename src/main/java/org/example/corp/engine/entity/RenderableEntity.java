@@ -4,10 +4,13 @@ import org.example.corp.engine.Camera;
 import org.example.corp.engine.Window;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
+import org.example.corp.engine.shader.DefaultShaderProgram;
 import org.example.corp.engine.shader.ShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.example.corp.engine.util.BufferUtils;
 
+import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_BOUNDS;
+import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_TEXTURE_CORDS;
 import static org.example.corp.engine.shader.ShaderProgramsManager.DEFAULT_PROGRAM;
 import static org.lwjgl.opengl.GL30.*;
 
@@ -28,23 +31,17 @@ public abstract class RenderableEntity extends Entity implements Renderable {
 
     private float[] vertexArray;
 
-    private final int attrBounds;
-    private final int attrTextureCords;
-
-    private ShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DEFAULT_PROGRAM);
+    private DefaultShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DefaultShaderProgram.class);
 
     public RenderableEntity(Sprite sprite) throws EngineException {
         this.sprite = sprite;
-
-        attrBounds = shaderProgram.getAttribute("bounds");
-        attrTextureCords = shaderProgram.getAttribute("texture_cords");
 
         vaoId = glGenVertexArrays();
         glBindVertexArray(vaoId);
 
         vboId = glGenBuffers();
         refreshVertexArray();
-        glVertexAttribPointer(attrBounds, 2, GL_FLOAT, false, 0, 0);
+        glVertexAttribPointer(ATTR_BOUNDS.getId(), 2, GL_FLOAT, false, 0, 0);
 
         eboId = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
@@ -87,18 +84,18 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         if (!shouldBeRendered()) return;
 
         glBindVertexArray(vaoId);
-        glEnableVertexAttribArray(attrBounds);
-        glEnableVertexAttribArray(attrTextureCords);
+        glEnableVertexAttribArray(ATTR_BOUNDS.getId());
+        glEnableVertexAttribArray(ATTR_TEXTURE_CORDS.getId());
 
-        shaderProgram.setUniform("position", x, y);
-        shaderProgram.setUniform("depth", -depth);
+        shaderProgram.setPosition(x, y);
+        shaderProgram.setDepth(-depth);
         shaderProgram.bindAndPerform(p -> {
             sprite.bindTexture();
             glDrawElements(GL_TRIANGLES, elementsArray.length, GL_UNSIGNED_INT, 0);
         });
 
-        glDisableVertexAttribArray(attrBounds);
-        glDisableVertexAttribArray(attrTextureCords);
+        glDisableVertexAttribArray(ATTR_BOUNDS.getId());
+        glDisableVertexAttribArray(ATTR_TEXTURE_CORDS.getId());
         glBindVertexArray(0);
     }
 

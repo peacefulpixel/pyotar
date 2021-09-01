@@ -4,6 +4,7 @@ import org.example.corp.engine.Camera;
 import org.example.corp.engine.Window;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.res.Image;
+import org.example.corp.engine.shader.DefaultShaderProgram;
 import org.example.corp.engine.shader.ShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.example.corp.engine.util.BufferUtils;
@@ -17,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.lang.Math.toRadians;
+import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_TEXTURE_CORDS;
 import static org.example.corp.engine.shader.ShaderProgramsManager.DEFAULT_PROGRAM;
 import static org.lwjgl.opengl.GL30.*;
 
@@ -46,9 +48,7 @@ public class Sprite implements Comparable<Sprite> {
     private Matrix4f transformation;
     private double rotation;
 
-    private final int attrTextureCords;
-
-    private ShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DEFAULT_PROGRAM);
+    private DefaultShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DefaultShaderProgram.class);
 
     /**
      * @see Sprite#Sprite(Texture, float)
@@ -74,8 +74,6 @@ public class Sprite implements Comparable<Sprite> {
 
         setAxisToMiddle();
 
-        attrTextureCords = shaderProgram.getAttribute("texture_cords");
-
         rotation = 180.0d;
 
         rebuildTransformationMatrix();
@@ -92,7 +90,7 @@ public class Sprite implements Comparable<Sprite> {
         textureCordsVBOId = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, textureCordsVBOId);
         BufferUtils.glBufferData(GL_ARRAY_BUFFER, textureCords, GL_STATIC_DRAW);
-        glVertexAttribPointer(attrTextureCords, 2, GL_FLOAT, false, 0, 0);
+        glVertexAttribPointer(ATTR_TEXTURE_CORDS.getId(), 2, GL_FLOAT, false, 0, 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -107,9 +105,9 @@ public class Sprite implements Comparable<Sprite> {
 
     public void bindTexture() {
         texture.bindTexture();
-        shaderProgram.setUniform("texture_2d", 0);
-        shaderProgram.setUniform("texture_color", color);
-        shaderProgram.setUniform("transformation", transformation);
+        shaderProgram.setTexture2d(0);
+        shaderProgram.setTextureColor(color.x, color.y, color.z);
+        shaderProgram.setTransformation(transformation);
     }
 
     public void rebuildTransformationMatrix() {

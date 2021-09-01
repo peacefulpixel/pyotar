@@ -1,6 +1,7 @@
 package org.example.corp.engine.shader;
 
 import org.example.corp.engine.exception.ShaderInitializationException;
+import org.example.corp.engine.glsl.type.Vec2;
 import org.example.corp.engine.util.LoggerUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -13,9 +14,12 @@ import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL20.*;
 
-public class ShaderProgram {
+public abstract class ShaderProgram {
 
     private static final Logger logger = LoggerUtils.getLogger(ShaderProgram.class);
+
+    public static final String UNIFORM_ORTHO           = "ortho";
+    public static final String UNIFORM_CAMERA_POSITION = "camera_position";
 
     protected final int id;
 
@@ -32,6 +36,13 @@ public class ShaderProgram {
             throw new ShaderInitializationException("Unable to create shader program " + id);
         }
     }
+
+    /**
+     * Shader should be bound before this method being invoked
+     */
+    protected abstract void initAttributes();
+
+    protected abstract String getName();
 
     public void createVertexShader(String shaderCode) throws ShaderInitializationException {
         vertexShaderId = createShader(shaderCode, GL_VERTEX_SHADER);
@@ -80,7 +91,7 @@ public class ShaderProgram {
 
     }
 
-    public int getAttribute(String name) {
+    protected int getAttributeId(String name) {
         return ShaderProgramsManager.getAttribute(this, name);
     }
 
@@ -89,13 +100,13 @@ public class ShaderProgram {
         if (uniformLocation < 0) {
             logger.warning("Unable to create uniform. Apparently, it's not declared in shader program or was" +
                     "removed by OpenGL shader compiler for optimization. uniformName=" + uniformName +
-                    "shaderProgramId=" + id);
+                    " shaderProgramId=" + id);
             return;
         }
         uniformsCache.put(uniformName, uniformLocation);
     }
 
-    public void setUniform(String uniform, Vector3f value) {
+    protected void setUniform(String uniform, Vector3f value) {
         performSafeUniformAction(uniform, location -> {
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 FloatBuffer fb = stack.mallocFloat(3);
@@ -105,7 +116,7 @@ public class ShaderProgram {
         });
     }
 
-    public void setUniform(String uniform, Matrix4f value) {
+    protected void setUniform(String uniform, Matrix4f value) {
         performSafeUniformAction(uniform, location -> {
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 FloatBuffer fb = stack.mallocFloat(16);
@@ -115,20 +126,30 @@ public class ShaderProgram {
         });
     }
 
-    public void setUniform(String uniform, float v1, float v2, float v3) {
+    protected void setUniform(String uniform, float v1, float v2, float v3) {
         performSafeUniformAction(uniform, location -> glUniform3f(location, v1, v2, v3));
     }
 
-    public void setUniform(String uniform, float v1, float v2) {
+    protected void setUniform(String uniform, float v1, float v2) {
         performSafeUniformAction(uniform, location -> glUniform2f(location, v1, v2));
     }
 
-    public void setUniform(String uniform, int value) {
+    protected void setUniform(String uniform, int value) {
         performSafeUniformAction(uniform, location -> glUniform1i(location, value));
     }
 
-    public void setUniform(String uniform, float value) {
+    protected void setUniform(String uniform, float value) {
         performSafeUniformAction(uniform, location -> glUniform1f(location, value));
+    }
+
+    @Vec2
+    public void setOrtho(float x, float y) {
+        setUniform(UNIFORM_ORTHO, x, y);
+    }
+
+    @Vec2
+    public void setCameraPosition(float x, float y) {
+        setUniform(UNIFORM_CAMERA_POSITION, x, y);
     }
 
     private void performSafeUniformAction(String uniform, UniformAction action) {

@@ -17,8 +17,9 @@ public class ShaderProgramsManager {
 
     private static final Logger logger = LoggerUtils.getLogger(ShaderProgramsManager.class);
 
-    private static final Map<String, ShaderProgram> shaderPrograms = new HashMap<>();
+    private static final Map<Class<? extends ShaderProgram>, ShaderProgram> shaderPrograms = new HashMap<>();
     private static String shaderDir = "res/shaders/";
+
     public static final String DEFAULT_PROGRAM = "default";
 
     private static int boundProgram = 0;
@@ -27,9 +28,18 @@ public class ShaderProgramsManager {
         shaderDir = path;
     }
 
-    public static ShaderProgram createShaderProgram(String name) throws ShaderInitializationException {
-        ShaderProgram program;
-        program = new ShaderProgram();
+    public static <T extends ShaderProgram> T createShaderProgram(Class<T> clazz)
+            throws ShaderInitializationException {
+        T program;
+        try {
+            program = clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new ShaderInitializationException("Unable to create instance of shader class " + clazz +
+                    ". Verify that empty constructor exists", e);
+        }
+
+        String name = program.getName();
+
         Shader vs = ResourceManager.get(Shader.class, shaderDir + name + ".vs");
         Shader fs = ResourceManager.get(Shader.class, shaderDir + name + ".fs");
 
@@ -41,14 +51,17 @@ public class ShaderProgramsManager {
         program.createVertexShader(vs.getShaderSource());
         program.createFragmentShader(fs.getShaderSource());
         program.link();
-        shaderPrograms.put(name, program);
+        program.initAttributes();
+
+        shaderPrograms.put(clazz, program);
         return program;
     }
 
-    public static ShaderProgram getShaderProgram(String name) throws ShaderInitializationException {
-        ShaderProgram program;
-        if ((program = shaderPrograms.get(name)) == null) {
-            throw new ShaderInitializationException("Shader " + name + " is not initialized");
+    @SuppressWarnings("unchecked")
+    public static <T extends ShaderProgram> T getShaderProgram(Class<T> clazz) throws ShaderInitializationException {
+        T program;
+        if ((program = (T) shaderPrograms.get(clazz)) == null) {
+            throw new ShaderInitializationException("Shader " + clazz + " is not initialized");
         }
 
         return program;

@@ -161,7 +161,7 @@ public class Window {
     public synchronized void refreshViewport(float width, float height, double aspect) {
         glViewport(0, 0, (int) width, (int) height);
         glOrtho(-aspect/2, aspect/2, -1, 1, -1, 1);
-        ShaderProgramsManager.bindAndPerform(program -> program.setUniform("ortho", width/2, height/2));
+        ShaderProgramsManager.bindAndPerform(program -> program.setOrtho(width/2, height/2));
     }
 
     public void refreshViewport() {
