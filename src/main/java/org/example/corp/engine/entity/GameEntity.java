@@ -4,7 +4,7 @@ import org.example.corp.engine.base.Logical;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
 
-public abstract class GameEntity extends RenderableEntity implements Logical {
+public abstract class GameEntity extends SquareEntity implements Logical {
 
     public GameEntity(Sprite sprite) throws EngineException {
         super(sprite);

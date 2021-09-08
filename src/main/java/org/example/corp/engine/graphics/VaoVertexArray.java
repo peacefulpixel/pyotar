@@ -4,7 +4,9 @@ import org.example.corp.engine.shader.Attribute;
 import org.example.corp.engine.util.BufferUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL30.*;
@@ -16,19 +18,20 @@ import static org.lwjgl.opengl.GL30.*;
  *            should be read by video adapter, so it will always read the same size unless you re-create VAO based
  *            vertex array.
  */
-public class VaoVertexArray implements VertexArray {
+public class VaoVertexArray extends ElementsBasedVertexArray {
 
     private final int vaoId;
     private final int eboId;
 
-    private float[] vertices;
     private int[] elements;
+    private final int size;
 
-    private List<Integer> vboIds = new ArrayList<>(2);
+    private Map<Attribute, Integer> vboIds = new HashMap<>(2);
+    private Map<Attribute, float[]> vertexArrays = new HashMap<>(2);
 
     public VaoVertexArray(Attribute verticesAttribute, float[] vertices, int[] elements) {
-        this.vertices = vertices;
         this.elements = elements;
+        size = vertices.length;
 
         vaoId = glGenVertexArrays();
         glBindVertexArray(vaoId);
@@ -46,7 +49,7 @@ public class VaoVertexArray implements VertexArray {
     @Override
     public void destroy() {
         glBindVertexArray(vaoId);
-        for (int vboId : vboIds) {
+        for (int vboId : vboIds.values()) {
             glDeleteBuffers(vboId);
         }
         glDeleteBuffers(eboId);
@@ -60,7 +63,7 @@ public class VaoVertexArray implements VertexArray {
     }
 
     public void bindBuffers() {
-        for (int vboId : vboIds) {
+        for (int vboId : vboIds.values()) {
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
@@ -70,22 +73,6 @@ public class VaoVertexArray implements VertexArray {
     public void unbind() {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
-    }
-
-    @Override
-    public void setVertices(float[] vertices) {
-        this.vertices = vertices;
-
-        glBindVertexArray(vaoId);
-        glBindBuffer(GL_ARRAY_BUFFER, vboIds.get(0));
-        BufferUtils.glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-    }
-
-    @Override
-    public float[] getVertices() {
-        return vertices;
     }
 
     public int[] getElements() {
@@ -107,15 +94,37 @@ public class VaoVertexArray implements VertexArray {
         BufferUtils.glBufferData(GL_ARRAY_BUFFER, values, GL_STATIC_DRAW);
         glVertexAttribPointer(attribute.getId(), attribute.getSize(), attribute.getGlType(), false, 0, 0);
 
-        vboIds.add(vboId);
+        vboIds.put(attribute, vboId);
+        vertexArrays.put(attribute, values);
     }
 
-    public void addBuffer(Attribute attribute, float[] values) {
+    @Override
+    public float[] getBuffer(Attribute attribute) {
+        return vertexArrays.get(attribute);
+    }
+
+    @Override
+    public void setBuffer(Attribute attribute, float[] values) {
         glBindVertexArray(vaoId);
 
-        addBufferWithoutBindings(attribute, values);
+        Integer oldVbo;
+        if ((oldVbo = vboIds.get(attribute)) != null) {
+            glDeleteBuffers(oldVbo);
+        }
 
+        addBufferWithoutBindings(attribute, values);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+
         glBindVertexArray(0);
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    @Override
+    public int getElementsSize() {
+        return elements.length;
     }
 }

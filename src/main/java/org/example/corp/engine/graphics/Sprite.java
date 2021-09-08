@@ -30,14 +30,23 @@ public class Sprite implements Comparable<Sprite>, Destroyable {
 
     private final Logger logger = LoggerUtils.getLogger(Sprite.class);
 
-    private static final float[] textureCords = new float[] {
+    private static final float[] textureCordsWithElements = new float[] {
             0.0f, 0.0f, // Top-left
             1.0f, 0.0f, // Top-right
             1.0f, 1.0f, // Bottom-right
             0.0f, 1.0f,  // Bottom-left
     };
 
-    private FloatBuffer textureCordsBuffer = null; // TODO: Could be static so will eat less memory
+    private static final float[] textureCordsNoElements = new float[] {
+            0.0f, 0.0f, // Top-left
+            1.0f, 0.0f, // Top-right
+            1.0f, 1.0f, // Bottom-right
+            1.0f, 1.0f, // Bottom-right
+            0.0f, 1.0f,  // Bottom-left
+            0.0f, 0.0f, // Top-left
+    };
+
+    private float[] textureCords = textureCordsWithElements;
 
     private Texture[] textures;
     private int textureCordsVBOId = 0;
@@ -89,12 +98,16 @@ public class Sprite implements Comparable<Sprite>, Destroyable {
         rebuildTransformationMatrix();
     }
 
-    public void bind(VaoVertexArray vertexArray) throws EngineException {
+    public void bind(VertexArray vertexArray) throws EngineException {
         if (vaoId != 0) {
             throw new EngineException("Unable to bind texture, since it's already bound. Old VAO ID: " + vaoId);
         }
 
-        vertexArray.addBuffer(ATTR_TEXTURE_CORDS, textureCords);
+        if (!vertexArray.isSupportElements()) {
+            textureCords = textureCordsNoElements;
+        }
+
+        vertexArray.setBuffer(ATTR_TEXTURE_CORDS, textureCords);
     }
 
     @Override
@@ -107,18 +120,6 @@ public class Sprite implements Comparable<Sprite>, Destroyable {
 
 //        vaoId = 0;
     }
-    /**
-     * Bind buffers as attributes.
-     * Could be used when sprite was not bound with VAO
-     */
-    public void bindBuffers() {
-        if (textureCordsBuffer == null) {
-            textureCordsBuffer = MemoryUtil.memAllocFloat(8);
-            textureCordsBuffer.put(textureCords).flip();
-        }
-        glVertexAttribPointer(ATTR_BOUNDS.getId(), 2, GL_FLOAT, false, 0, textureCordsBuffer);
-    }
-
 
     public void setUniforms() {
         shaderProgram.setTexture2d(0);
