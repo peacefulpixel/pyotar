@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.function.IntFunction;
 
-public class Image implements Resource {
+public class Image extends Resource {
     private final FinalObject<ByteBuffer> decodedImage = new FinalObject<>();
     private final FinalObject<Integer> width = new FinalObject<>();
     private final FinalObject<Integer> height = new FinalObject<>();
@@ -45,6 +45,7 @@ public class Image implements Resource {
         decodedImage.set(byteBuffer);
         width.set(decoder.getWidth());
         height.set(decoder.getHeight());
+        successfullyLoaded = true;
     }
 
     @Override

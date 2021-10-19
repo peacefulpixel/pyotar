@@ -8,7 +8,7 @@ import org.example.corp.engine.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 
-public class Shader implements Resource {
+public class Shader extends Resource {
     private final FinalObject<String> shaderSource = new FinalObject<>();
 
     @Override
@@ -18,6 +18,7 @@ public class Shader implements Resource {
         } catch (IOException e) {
             throw new ResourceInitializationException("Unable to read shader source file", e);
         }
+        successfullyLoaded = true;
     }
 
     @Override
