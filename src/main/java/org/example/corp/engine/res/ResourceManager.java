@@ -58,6 +58,8 @@ public class ResourceManager {
             resource = new Image();
         } else if (path.endsWith(".vs") || path.endsWith(".fs")) {
             resource = new Shader();
+        } else if (path.endsWith(".fnt")) {
+            resource = new BitmapFontResource();
         }
 
         if (resource == null) {
