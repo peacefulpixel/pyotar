@@ -1,17 +1,15 @@
 package org.example.corp.engine.graphics.font.bitmap.map;
 
-import javax.xml.bind.annotation.XmlAttribute;
-
 public class Info {
-    @XmlAttribute public String face;
-    @XmlAttribute public float size;
-    @XmlAttribute public float bold;
-    @XmlAttribute public float italic;
-    @XmlAttribute public String charset;
-    @XmlAttribute public float unicode;
-    @XmlAttribute public float stretchH;
-    @XmlAttribute public float smooth;
-    @XmlAttribute public float aa;
-    @XmlAttribute public String padding;
-    @XmlAttribute public String spacing;
+    public String face;
+    public Float size;
+    public Float bold;
+    public Float italic;
+    public String charset;
+    public Float unicode;
+    public Float stretchH;
+    public Float smooth;
+    public Float aa;
+    public String padding;
+    public String spacing;
 }
