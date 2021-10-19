@@ -23,8 +23,11 @@ public class FinalObject<T> {
 
     public void set(T value) {
         if (isInitialized) {
-            logger.warning("Attempt to set value to already initialized FinalObject. this.value=" + this.value
-                    + ", value=" + value);
+            StringBuilder builder = new StringBuilder("Attempt to set value to already initialized FinalObject. ");
+            builder.append("this.value=").append(this.value)
+                    .append(", value=").append(value).append(". Stack trace:\n");
+            LoggerUtils.printStackTraceToString(builder);
+            logger.warning(builder.toString());
             return;
         }
 

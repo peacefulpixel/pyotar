@@ -1,19 +1,23 @@
 package org.example.corp.engine.entity;
 
-import org.example.corp.engine.Camera;
-import org.example.corp.engine.Window;
 import org.example.corp.engine.base.Renderable;
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.graphics.*;
-import org.example.corp.engine.shader.DefaultShaderProgram;
-import org.example.corp.engine.shader.ShaderProgramsManager;
-import org.example.corp.engine.util.BufferUtils;
+import org.example.corp.engine.graphics.ElementsBasedVertexArray;
+import org.example.corp.engine.graphics.Sprite;
+import org.example.corp.engine.graphics.Texture;
+import org.example.corp.engine.graphics.VertexArray;
+import org.example.corp.engine.shader.ShaderProgram;
+import org.example.corp.engine.util.LoggerUtils;
+
+import java.util.logging.Logger;
 
 import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_BOUNDS;
 import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_TEXTURE_CORDS;
 import static org.lwjgl.opengl.GL30.*;
 
 public abstract class RenderableEntity extends Entity implements Renderable {
+
+    private static final Logger logger = LoggerUtils.getLogger(RenderableEntity.class);
 
     private Sprite sprite;
     private float x = 0.0f;
@@ -22,8 +26,6 @@ public abstract class RenderableEntity extends Entity implements Renderable {
 
     protected float[] vertexArray;
     protected VertexArray vertices;
-
-    private DefaultShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DefaultShaderProgram.class);
 
     public RenderableEntity(Sprite sprite) throws EngineException {
         this.sprite = sprite;
@@ -41,6 +43,16 @@ public abstract class RenderableEntity extends Entity implements Renderable {
     @Override
     public synchronized void render() {
         if (!shouldBeRendered()) return;
+
+        ShaderProgram shaderProgram = layer.getShaderProgram();
+        if (shaderProgram == null) {
+            logger.warning("Entity " + this + " is not ready for rendering since the shader program is not set");
+            return;
+        }
+
+        if (sprite.getShaderProgram() == null) {
+            sprite.setShaderProgram(shaderProgram);
+        }
 
         vertices.bind();
         ATTR_BOUNDS.enable();

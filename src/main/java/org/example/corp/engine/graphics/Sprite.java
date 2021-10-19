@@ -28,7 +28,7 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Sprite implements Comparable<Sprite>, Destroyable {
 
-    private final Logger logger = LoggerUtils.getLogger(Sprite.class);
+    private static final Logger logger = LoggerUtils.getLogger(Sprite.class);
 
     private static final float[] textureCordsWithElements = new float[] {
             0.0f, 0.0f, // Top-left
@@ -63,7 +63,7 @@ public class Sprite implements Comparable<Sprite>, Destroyable {
     private Matrix4f transformation;
     private double rotation;
 
-    private DefaultShaderProgram shaderProgram = ShaderProgramsManager.getShaderProgram(DefaultShaderProgram.class);
+    private ShaderProgram shaderProgram;
 
     /**
      * @see Sprite#Sprite(float, Texture...)
@@ -122,6 +122,12 @@ public class Sprite implements Comparable<Sprite>, Destroyable {
     }
 
     public void setUniforms() {
+
+        if (shaderProgram == null) {
+            logger.warning("Shader program is not set for the Sprite, so it couldn't update uniforms");
+            return;
+        }
+
         shaderProgram.setTexture2d(0);
         shaderProgram.setTextureColor(color.x, color.y, color.z); // TODO: ?
         shaderProgram.setTransformation(transformation);
@@ -174,6 +180,14 @@ public class Sprite implements Comparable<Sprite>, Destroyable {
 
     public Texture[] getTextures() {
         return textures;
+    }
+
+    public ShaderProgram getShaderProgram() {
+        return shaderProgram;
+    }
+
+    public void setShaderProgram(ShaderProgram shaderProgram) {
+        this.shaderProgram = shaderProgram;
     }
 
     @Override

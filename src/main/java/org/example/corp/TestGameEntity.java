@@ -1,7 +1,6 @@
 package org.example.corp;
 
 import org.example.corp.engine.Random;
-import org.example.corp.engine.World;
 import org.example.corp.engine.entity.GameEntity;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
@@ -41,7 +40,7 @@ public class TestGameEntity extends GameEntity {
 
     @Override
     public void init() {
-        setDepth(world.nextTopDepth());
+        setDepth(layer.nextTopDepth());
     }
 
     @Override

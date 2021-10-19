@@ -1,19 +1,19 @@
 package org.example.corp.engine.entity;
 
-import org.example.corp.engine.World;
+import org.example.corp.engine.Layer;
 import org.example.corp.engine.base.Destroyable;
 
 public abstract class Entity implements Comparable<Entity>, Destroyable {
     public final int id = hashCode();
-    protected World world;
+    protected Layer layer;
 
-    public void setWorld(World world) {
-        this.world = world;
+    public void setLayer(Layer layer) {
+        this.layer = layer;
     }
 
     @Override
     public void destroy() {
-        world.removeEntity(this);
+        layer.removeEntity(this);
     }
 
     @Override

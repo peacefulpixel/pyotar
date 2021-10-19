@@ -2,13 +2,13 @@ package org.example.corp.engine;
 
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.shader.DefaultShaderProgram;
+import org.example.corp.engine.shader.ExtraShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
 import java.util.logging.Logger;
 
-import static org.example.corp.engine.shader.ShaderProgramsManager.DEFAULT_PROGRAM;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -27,7 +27,7 @@ public class Game {
     private final Logger logger = Logger.getLogger(Game.class.getName());
 
     private Window window;
-    private World world;
+    private Stage stage;
 
     private void initWindow() throws EngineException {
         logger.fine("Initializing game window");
@@ -42,6 +42,7 @@ public class Game {
 
     private void initShaders() throws EngineException {
         ShaderProgramsManager.createShaderProgram(DefaultShaderProgram.class);
+        ShaderProgramsManager.createShaderProgram(ExtraShaderProgram.class);
     }
 
     public void init() throws EngineException {
@@ -61,16 +62,13 @@ public class Game {
 
         initShaders();
         glActiveTexture(GL_TEXTURE0);
-
-        world.init();
     }
 
     private void loop() throws EngineException {
         while (!window.isShouldClose()) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            world.loop();
-            world.render();
+            stage.render();
 
             glfwSwapBuffers(window.getGlfwId());
             glfwPollEvents();
@@ -79,8 +77,8 @@ public class Game {
         }
     }
 
-    public Game(World world) {
-        this.world = world;
+    public Game(Stage stage) {
+        this.stage = stage;
     }
 
     public void start() throws EngineException {
@@ -92,7 +90,7 @@ public class Game {
     }
 
     public void free() {
-        world.free();
+        stage.free();
         ShaderProgramsManager.free();
         glfwFreeCallbacks(window.getGlfwId());
         glfwDestroyWindow(window.getGlfwId());

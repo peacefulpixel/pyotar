@@ -1,10 +1,13 @@
 package org.example.corp;
 
-import org.example.corp.engine.entity.Entity;
 import org.example.corp.engine.entity.LogicalEntity;
 import org.example.corp.engine.event.EventManager;
 import org.example.corp.engine.event.impl.FpsChangedEvent;
 import org.example.corp.engine.exception.EngineException;
+import org.example.corp.engine.graphics.Sprite;
+import org.example.corp.engine.graphics.Texture;
+import org.example.corp.engine.res.Image;
+import org.example.corp.engine.res.ResourceManager;
 import org.example.corp.engine.util.LoggerUtils;
 
 import java.util.logging.Logger;
@@ -23,14 +26,29 @@ public class MemoryTestLogicalEntity extends LogicalEntity {
         });
 
         try {
-            for (int x = 0; x < 2000; x++) {
-                Entity entity = new TestGameEntity();
-                world.addEntity(entity);
-                instanceCounter++;
-            }
+            TestGameEntity3 entity1 = new TestGameEntity3(new Sprite(
+                    new Texture(ResourceManager.get(Image.class, "res/img/test_building1.png"))));
+            TestGameEntity3 entity2 = new TestGameEntity3(new Sprite(
+                    new Texture(ResourceManager.get(Image.class, "res/img/test_building2.png"))));
+            entity1.setX(entity1.getX() - 50);
+            entity1.setDepth(0.2f);
+            entity2.setDepth(0.1f);
+            layer.addEntities(entity1);
+            layer.addEntities(entity2);
+            layer.addEntity(new TestGameEntity2());
         } catch (EngineException e) {
             e.printStackTrace();
         }
+
+//        try {
+//            for (int x = 0; x < 2000; x++) {
+//                Entity entity = new TestGameEntity();
+//                world.addEntity(entity);
+//                instanceCounter++;
+//            }
+//        } catch (EngineException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override

@@ -21,6 +21,8 @@ public class LoggerUtils {
 
     private static FileHandler handler;
 
+    public static final String DEFAULT_ST_SEPARATOR = "\n";
+
     private static void createFileHandler(String path) throws IOException {
         handler = new FileHandler(path);
         Formatter formatter = new SimpleFormatter();
@@ -64,5 +66,36 @@ public class LoggerUtils {
             logger.addHandler(handler);
         }
         return Logger.getLogger(clazz.getName());
+    }
+
+    /**
+     * Prints stack trace of current thread to the provided StringBuilder
+     * @param builder builder to print stack trace
+     * @param separator separating string between stack trace elements
+     */
+    public static void printStackTraceToString(StringBuilder builder, String separator) {
+        if (builder == null)
+            return;
+
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        for (StackTraceElement element : elements) {
+            builder.append(element);
+            if (element != elements[elements.length - 1])
+                builder.append(separator);
+        }
+    }
+
+    public static void printStackTraceToString(StringBuilder builder) {
+        printStackTraceToString(builder, DEFAULT_ST_SEPARATOR);
+    }
+
+    public static String printStackTraceToString(String separator) {
+        StringBuilder builder = new StringBuilder();
+        printStackTraceToString(builder, separator);
+        return builder.toString();
+    }
+
+    public static String printStackTraceToString() {
+        return printStackTraceToString(DEFAULT_ST_SEPARATOR);
     }
 }

@@ -1,7 +1,8 @@
 package org.example.corp.engine.shader;
 
 import org.example.corp.engine.exception.ShaderInitializationException;
-import org.example.corp.engine.glsl.type.Vec2;
+import org.example.corp.engine.glsl.type.*;
+import org.example.corp.engine.glsl.type.Float;
 import org.example.corp.engine.util.LoggerUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -18,8 +19,18 @@ public abstract class ShaderProgram {
 
     private static final Logger logger = LoggerUtils.getLogger(ShaderProgram.class);
 
+    @Vec2
+    public static final Attribute ATTR_BOUNDS        = new Attribute("bounds", 2, GL_FLOAT);
+    @Vec2
+    public static final Attribute ATTR_TEXTURE_CORDS = new Attribute("texture_cords", 2, GL_FLOAT);
+
     public static final String UNIFORM_ORTHO           = "ortho";
     public static final String UNIFORM_CAMERA_POSITION = "camera_position";
+    public static final String UNIFORM_POSITION        = "position";
+    public static final String UNIFORM_TRANSFORMATION  = "transformation";
+    public static final String UNIFORM_DEPTH           = "depth";
+    public static final String UNIFORM_TEXTURE_COLOR   = "texture_color";
+    public static final String UNIFORM_TEXTURE_2D      = "texture_2d";
 
     protected final int id;
 
@@ -40,7 +51,10 @@ public abstract class ShaderProgram {
     /**
      * Shader should be bound before this method being invoked
      */
-    protected abstract void initAttributes();
+    protected void initAttributes() {
+        ATTR_BOUNDS.setId(getAttributeId(ATTR_BOUNDS.getName()));
+        ATTR_TEXTURE_CORDS.setId(getAttributeId(ATTR_TEXTURE_CORDS.getName()));
+    };
 
     protected abstract String getName();
 
@@ -150,6 +164,31 @@ public abstract class ShaderProgram {
     @Vec2
     public void setCameraPosition(float x, float y) {
         setUniform(UNIFORM_CAMERA_POSITION, x, y);
+    }
+
+    @Vec2
+    public void setPosition(float x, float y) {
+        setUniform(UNIFORM_POSITION, x, y);
+    }
+
+    @Mat4
+    public void setTransformation(Matrix4f m) {
+        setUniform(UNIFORM_TRANSFORMATION, m);
+    }
+
+    @Float
+    public void setDepth(float v) {
+        setUniform(UNIFORM_DEPTH, v);
+    }
+
+    @Vec3
+    public void setTextureColor(float x, float y, float z) {
+        setUniform(UNIFORM_TEXTURE_COLOR, x, y ,z);
+    }
+
+    @Sampler2d
+    public void setTexture2d(int v) {
+        setUniform(UNIFORM_TEXTURE_2D, v);
     }
 
     private void performSafeUniformAction(String uniform, UniformAction action) {

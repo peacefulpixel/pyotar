@@ -1,17 +1,33 @@
 package org.example.corp.engine;
 
-import org.example.corp.engine.entity.Entity;
 import org.example.corp.engine.base.Logical;
 import org.example.corp.engine.base.Renderable;
+import org.example.corp.engine.entity.Entity;
 import org.example.corp.engine.entity.RenderableEntity;
+import org.example.corp.engine.exception.ShaderInitializationException;
+import org.example.corp.engine.shader.DefaultShaderProgram;
+import org.example.corp.engine.shader.ShaderProgram;
+import org.example.corp.engine.shader.ShaderProgramsManager;
+import org.example.corp.engine.util.LoggerUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class World implements Renderable, Logical {
+import static java.util.logging.Level.SEVERE;
 
+public class Layer implements Renderable, Logical {
+
+    private static final Logger logger = LoggerUtils.getLogger(Layer.class);
+
+    private Stage stage;
+    private ShaderProgram shaderProgram;
+    private Class<? extends ShaderProgram> shaderClass;
     protected final List<Entity> entities;
     private boolean isAutoSortingEnabled = true;
 
@@ -22,8 +38,13 @@ public class World implements Renderable, Logical {
 
     public static final float DEPTH_STEP = 1e-8f;
 
-    public World() {
+    public Layer(Class<? extends ShaderProgram> shaderClass) {
         entities = new LinkedList<>();
+        this.shaderClass = shaderClass;
+    }
+
+    public Layer() {
+        this(DefaultShaderProgram.class);
     }
 
     public void addEntity(Entity entity) {
@@ -89,7 +110,7 @@ public class World implements Renderable, Logical {
      * Notice that all renderable entities should be always sorted by depth to avoid visual artifacts that caused by
      * default shaders and OpenGL DEPTH_TEST and BLEND functions. GL depth testing is working with model bounds which
      * is always square and not counting fragment alpha channel, so objects behind should be rendered first.
-     * You may disable auto-sorting with {@link World#setAutoSortingEnabled(boolean)} method, but make sure you
+     * You may disable auto-sorting with {@link Layer#setAutoSortingEnabled(boolean)} method, but make sure you
      * understand the issues it might cause.
      */
     public void sortEntities() {
@@ -112,6 +133,16 @@ public class World implements Renderable, Logical {
 
     @Override
     public void init() {
+        if (shaderClass == null) {
+            logger.warning("Shader class is null in layer " + this);
+        } else if (shaderProgram == null) {
+            try {
+                shaderProgram = ShaderProgramsManager.getShaderProgram(shaderClass);
+            } catch (ShaderInitializationException e) {
+                logger.log(SEVERE, "Unable to retrieve shader program of class " + shaderClass.toString(), e);
+            }
+        }
+
         synchronized (entities) {
             for (Entity entity : entities) {
                 if (entity instanceof Logical)
@@ -133,7 +164,7 @@ public class World implements Renderable, Logical {
                 Entity entity;
                 while ((entity = entitiesToAdd.poll()) != null) {
                     entities.add(entity);
-                    entity.setWorld(this);
+                    entity.setLayer(this);
 
                     if (entity instanceof Logical)
                         ((Logical) entity).init();
@@ -171,5 +202,17 @@ public class World implements Renderable, Logical {
 
     public void setAutoSortingEnabled(boolean autoSortingEnabled) {
         isAutoSortingEnabled = autoSortingEnabled;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    public ShaderProgram getShaderProgram() {
+        return shaderProgram;
     }
 }

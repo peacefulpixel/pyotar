@@ -1,18 +1,22 @@
 package org.example.corp;
 
-import org.example.corp.engine.Camera;
-import org.example.corp.engine.Window;
-import org.example.corp.engine.World;
+import org.example.corp.engine.*;
 import org.example.corp.engine.event.EventManager;
 import org.example.corp.engine.event.impl.WindowResizedEvent;
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.Game;
+import org.example.corp.engine.exception.ShaderInitializationException;
+import org.example.corp.engine.shader.DefaultShaderProgram;
+import org.example.corp.engine.shader.ExtraShaderProgram;
 
 public class Main {
 
     public static void main(String[] args) {
-        World world = new World();
-        Game game = new Game(world);
+        Layer layer = new Layer(DefaultShaderProgram.class);
+        Layer exLayer = new Layer(ExtraShaderProgram.class);
+        Stage stage = new Stage();
+        stage.addLayer(layer);
+        stage.addLayer(exLayer);
+        Game game = new Game(stage);
         try {
             game.init();
         } catch (EngineException e) {
@@ -27,7 +31,8 @@ public class Main {
         Window.MAIN_WINDOW.setCamera(camera);
 //        Window.MAIN_WINDOW.enableVSync();
 //        world.addEntity(new InitialLogicalEntity());
-        world.addEntity(new MemoryTestLogicalEntity());
+        layer.addEntity(new MemoryTestLogicalEntity());
+        exLayer.addEntity(new InitialLogicalEntity());
 
         try {
             game.start();
