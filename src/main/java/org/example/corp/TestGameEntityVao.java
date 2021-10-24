@@ -3,7 +3,6 @@ package org.example.corp;
 import org.example.corp.engine.Random;
 import org.example.corp.engine.entity.GameEntityVao;
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.graphics.Sprite;
 import org.example.corp.engine.graphics.Texture;
 import org.example.corp.engine.res.Image;
 import org.example.corp.engine.res.ResourceManager;
@@ -32,7 +31,7 @@ public class TestGameEntityVao extends GameEntityVao {
     }
 
     public TestGameEntityVao() throws EngineException {
-        super(new Sprite(0.1f * (Random.gen() % 40), getRandomTexture()));
+        super(getRandomTexture());
         moveX = Random.genUnsigned() % 2 == 1;
         movSpeed = Random.gen() % 120;
         rotationSpeed = Random.gen() % 90;
@@ -45,10 +44,9 @@ public class TestGameEntityVao extends GameEntityVao {
 
     @Override
     public void loop() {
-        Sprite sprite = getSprite();
         if (moveX) setX(getX() + movSpeed * deltaTime);
         else setY(getY() + movSpeed * deltaTime);
 
-        sprite.setRotation(sprite.getRotation() + rotationSpeed * deltaTime);
+        setRotation(getRotation() + rotationSpeed * deltaTime);
     }
 }

@@ -3,27 +3,26 @@ package org.example.corp.engine.entity;
 import org.example.corp.engine.Camera;
 import org.example.corp.engine.Window;
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.graphics.Sprite;
+import org.example.corp.engine.graphics.Texture;
 import org.example.corp.engine.graphics.VertexArray;
 
 import static org.example.corp.engine.shader.ShaderProgram.ATTR_BOUNDS;
 
 public abstract class SquareEntity extends RenderableEntity {
 
-    public SquareEntity(Sprite sprite) throws EngineException {
-        super(sprite);
+    public SquareEntity(Texture ...textures) throws EngineException {
+        super(textures);
     }
 
     protected abstract void vertexArrayPostRefreshing();
 
     @Override
     protected void refreshVertexArray() {
-        Sprite sprite = getSprite();
 
-        float axisX  = sprite.getAxisX();
-        float axisY  = sprite.getAxisY();
-        float width  = sprite.getWidth();
-        float height = sprite.getHeight();
+        float axisX  = getAxisX();
+        float axisY  = getAxisY();
+        float width  = getWidth();
+        float height = getHeight();
 
         vertexArray = new float[]{
 

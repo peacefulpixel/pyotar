@@ -2,12 +2,12 @@ package org.example.corp.engine.entity;
 
 import org.example.corp.engine.base.Logical;
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.graphics.Sprite;
+import org.example.corp.engine.graphics.Texture;
 
 public abstract class GameEntityVao extends VaoSquareEntity implements Logical {
 
-    public GameEntityVao(Sprite sprite) throws EngineException {
-        super(sprite);
+    public GameEntityVao(Texture ...textures) throws EngineException {
+        super(textures);
     }
 
     @Override

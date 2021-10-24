@@ -4,7 +4,6 @@ import org.example.corp.engine.entity.LogicalEntity;
 import org.example.corp.engine.event.EventManager;
 import org.example.corp.engine.event.impl.FpsChangedEvent;
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.graphics.Sprite;
 import org.example.corp.engine.graphics.Texture;
 import org.example.corp.engine.res.Image;
 import org.example.corp.engine.res.ResourceManager;
@@ -26,17 +25,17 @@ public class MemoryTestLogicalEntity extends LogicalEntity {
         });
 
         try {
-            TestGameEntity3Vao entity1 = new TestGameEntity3Vao(new Sprite(
-                    new Texture(ResourceManager.get(Image.class, "res/img/test_building1.png"))));
-            TestGameEntity3Vao entity2 = new TestGameEntity3Vao(new Sprite(
-                    new Texture(ResourceManager.get(Image.class, "res/img/test_building2.png"))));
+            TestGameEntity3Vao entity1 = new TestGameEntity3Vao(
+                    new Texture(ResourceManager.get(Image.class, "res/img/test_building1.png")));
+            TestGameEntity3Vao entity2 = new TestGameEntity3Vao(
+                    new Texture(ResourceManager.get(Image.class, "res/img/test_building2.png")));
             entity1.setX(entity1.getX() - 50);
             entity1.setDepth(0.2f);
             entity2.setDepth(0.1f);
             layer.addEntities(entity1);
             layer.addEntities(entity2);
             TestGameEntity2Vao x = new TestGameEntity2Vao();
-            x.getSprite().frame(8, 8, 16, 16);
+            x.frame(8, 8, 16, 16);
             layer.addEntity(x);
         } catch (EngineException e) {
             e.printStackTrace();

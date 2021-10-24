@@ -1,7 +1,7 @@
 package org.example.corp.engine.entity;
 
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.graphics.Sprite;
+import org.example.corp.engine.graphics.Texture;
 import org.example.corp.engine.graphics.VaoVertexArray;
 import org.example.corp.engine.graphics.VertexArray;
 import org.example.corp.engine.util.GLUtils;
@@ -12,8 +12,8 @@ import static org.example.corp.engine.util.GLUtils.VECTOR_SIZE_2D;
 
 public class VaoSquareEntity extends SquareEntity {
 
-    public VaoSquareEntity(Sprite sprite) throws EngineException {
-        super(sprite);
+    public VaoSquareEntity(Texture...textures) throws EngineException {
+        super(textures);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.example.corp.engine.entity;
 
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.graphics.Sprite;
 import org.example.corp.engine.graphics.Texture;
 
 public class TextEntity extends GuiEntity {
@@ -14,7 +13,7 @@ public class TextEntity extends GuiEntity {
     public class GlyphEntity extends SimpleSquareEntity {
 
         public GlyphEntity(Texture texture) throws EngineException {
-            super(new Sprite(texture));
+            super(texture);
         }
     }
 }
