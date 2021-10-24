@@ -2,6 +2,8 @@ package org.example.corp.engine.graphics;
 
 import org.example.corp.engine.res.Image;
 
+import java.nio.ByteBuffer;
+
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -32,6 +34,19 @@ public class Texture implements Comparable<Texture> {
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                 GL_UNSIGNED_BYTE, image.getDecodedImage());
+    }
+
+    private ByteBuffer clip(ByteBuffer decodedImage, int x, int y, int width, int height) {
+        int pixelSize = 4;
+        byte[] array = decodedImage.array();
+        byte[] newArray = new byte[width * height * pixelSize];
+        for (int iy = y; iy < height; iy++) {
+            for (int ix = x; ix < width; ix++) {
+
+            }
+        }
+        //TODO: CODE THAT
+        return null;
     }
 
     public void bindTexture() {

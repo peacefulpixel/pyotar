@@ -26,16 +26,18 @@ public class MemoryTestLogicalEntity extends LogicalEntity {
         });
 
         try {
-            TestGameEntity3 entity1 = new TestGameEntity3(new Sprite(
+            TestGameEntity3Vao entity1 = new TestGameEntity3Vao(new Sprite(
                     new Texture(ResourceManager.get(Image.class, "res/img/test_building1.png"))));
-            TestGameEntity3 entity2 = new TestGameEntity3(new Sprite(
+            TestGameEntity3Vao entity2 = new TestGameEntity3Vao(new Sprite(
                     new Texture(ResourceManager.get(Image.class, "res/img/test_building2.png"))));
             entity1.setX(entity1.getX() - 50);
             entity1.setDepth(0.2f);
             entity2.setDepth(0.1f);
             layer.addEntities(entity1);
             layer.addEntities(entity2);
-            layer.addEntity(new TestGameEntity2());
+            TestGameEntity2Vao x = new TestGameEntity2Vao();
+            x.getSprite().frame(8, 8, 16, 16);
+            layer.addEntity(x);
         } catch (EngineException e) {
             e.printStackTrace();
         }

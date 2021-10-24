@@ -1,0 +1,17 @@
+------------------------------------------------------------------------------
+This project is currently in alpha development state, which means that it's
+completely unusable and requires some time to have its first version. So
+don't be surprised if you see weird package names, unfinished code, test
+code, etc..
+
+This is fucking game engine, dude, it requires some work to make even initial
+state for that.
+
+p.s. we have no docs yet :(
+------------------------------------------------------------------------------
+
+This is light-weight game engine, based on LWJGL. We gonna support all the
+cool features from libGDX, for make development process more comfortable and
+easier to get in. Target platforms: Linux/Windows/OSX and that's it. No mobile
+or console platforms are planning to support, but how knows what it could be
+in the future :)

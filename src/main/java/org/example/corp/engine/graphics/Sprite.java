@@ -4,26 +4,19 @@ import org.example.corp.engine.Camera;
 import org.example.corp.engine.Window;
 import org.example.corp.engine.base.Destroyable;
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.res.Image;
-import org.example.corp.engine.shader.DefaultShaderProgram;
 import org.example.corp.engine.shader.ShaderProgram;
-import org.example.corp.engine.shader.ShaderProgramsManager;
-import org.example.corp.engine.util.BufferUtils;
+import org.example.corp.engine.util.ExceptionUtils;
+import org.example.corp.engine.util.GLUtils;
 import org.example.corp.engine.util.LoggerUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.system.MemoryUtil;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.util.Objects;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.lang.Math.toRadians;
-import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_BOUNDS;
 import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_TEXTURE_CORDS;
-import static org.example.corp.engine.shader.ShaderProgramsManager.DEFAULT_PROGRAM;
 import static org.lwjgl.opengl.GL30.*;
 
 public class Sprite implements Comparable<Sprite>, Destroyable {
@@ -64,6 +57,7 @@ public class Sprite implements Comparable<Sprite>, Destroyable {
     private double rotation;
 
     private ShaderProgram shaderProgram;
+    private VertexArray lastVertexArray;
 
     /**
      * @see Sprite#Sprite(float, Texture...)
@@ -108,6 +102,7 @@ public class Sprite implements Comparable<Sprite>, Destroyable {
         }
 
         vertexArray.setBuffer(ATTR_TEXTURE_CORDS, textureCords);
+        lastVertexArray = vertexArray;
     }
 
     @Override
@@ -151,6 +146,41 @@ public class Sprite implements Comparable<Sprite>, Destroyable {
     public void setAxisToMiddle() {
         axisX = width  / 2.0f;
         axisY = height / 2.0f;
+    }
+
+    /**
+     * Changes frame coordinates for sprite (0,0,sprite.getWidth(),sprite.getHeight() by default).
+     * Technically, changes the texture cords, so all sprites textures will take effect. Not affects a texture itself.
+     * @param x Frame X cord
+     * @param y Frame Y cord
+     * @param w Frame width
+     * @param h Frame height
+     */
+    public void frame(int x, int y, int w, int h) {
+        if (lastVertexArray == null) {
+            logger.warning("Sprite wasn't bound with any renderable entity, so couldn't determinate vertex " +
+                    "array type. Skipping framing for sprite\n" + LoggerUtils.printStackTraceToString("\n"));
+            return;
+        }
+
+        float horPx = 1.0f / width;
+        float verPx = 1.0f / height;
+        float[] texCords = new float[] {
+                x * horPx, y * verPx,                           // Top-left
+                x * horPx + w * horPx, y * verPx,              // Top-right
+                x * horPx + w * horPx, y * verPx + h * verPx, // Bottom-right
+                x * horPx, y * verPx + h * verPx,            // Bottom-left
+        };
+
+        System.out.println(Arrays.toString(texCords));
+
+        if (!lastVertexArray.isSupportElements()) {
+            texCords = GLUtils.unmapVertexArrayFromElements(texCords, GLUtils.SQUARE_ELEMENTS_ARRAY,
+                    GLUtils.VECTOR_SIZE_2D);
+        }
+
+        textureCords = texCords;
+        lastVertexArray.setBuffer(ATTR_TEXTURE_CORDS, textureCords);
     }
 
     public double getRotation() {

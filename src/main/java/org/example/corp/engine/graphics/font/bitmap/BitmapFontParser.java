@@ -5,8 +5,11 @@ import org.example.corp.engine.graphics.font.FontParser;
 import org.example.corp.engine.graphics.font.bitmap.map.*;
 import org.example.corp.engine.res.BitmapFontResource;
 import org.example.corp.engine.res.Image;
+import org.example.corp.engine.res.ResourceManager;
 import org.example.corp.engine.util.LoggerUtils;
+import org.example.corp.engine.util.StringUtils;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
@@ -24,12 +27,16 @@ public class BitmapFontParser implements FontParser<BitmapFont> {
         keyMappings.put("page", Page.class);
         keyMappings.put("char", Char.class);
         converterMappings.put(Float.class, Float::parseFloat);
-        converterMappings.put(String.class, s -> s);
+        converterMappings.put(String.class, s -> {
+            if (s.startsWith("\""))
+                return s.substring(1, s.length() - 1);
+            else return s;
+        });
     }
 
     private String fontSource;
     private List<Image> images;
-    private Path fontParentDirPath;
+    private File fontParentDir;
 
     public BitmapFontParser(BitmapFontResource fontResource) throws FontParsingException {
 
@@ -39,7 +46,10 @@ public class BitmapFontParser implements FontParser<BitmapFont> {
 
         fontSource = fontResource.getFontSource();
         images = new ArrayList<>();
-        fontParentDirPath = fontResource.getAbsolutePathOfFontDir();
+        fontParentDir = fontResource.getAbsolutePathOfFontDir().toFile();
+        if (!fontParentDir.isDirectory()) {
+            throw new FontParsingException("Font resource was loaded incorrectly");
+        }
     }
 
     private FontRoot createSampleFontRoot() {
@@ -122,7 +132,21 @@ public class BitmapFontParser implements FontParser<BitmapFont> {
     @Override
     public BitmapFont parse() throws FontParsingException {
         FontRoot fontRoot = serializeSource();
-        return null;
+        List<Image> images = new ArrayList<>();
+        for (Page page : fontRoot.pages) {
+            if (isStringNullOrEmpty(page.file))
+                throw new FontParsingException("There's no file defined for page " + page.id);
+
+            Path pageFilePath = fontParentDir.toPath().resolve(page.file);
+            File pageFile = fontParentDir.toPath().resolve(page.file).toFile();
+            if (!pageFile.exists() || !pageFile.isFile() || !pageFile.canRead())
+                throw new FontParsingException("Couldn't read page file from disk: " + pageFile);
+
+            Image pageImage = ResourceManager.get(Image.class, pageFilePath);
+            images.add(pageImage);
+        }
+
+        return new BitmapFont(fontRoot, images.toArray(new Image[0]));
     }
 
     private interface TypeConverter {

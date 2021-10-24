@@ -4,6 +4,7 @@ import org.example.corp.engine.exception.ResourceInitializationException;
 import org.example.corp.engine.util.LoggerUtils;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -41,6 +42,10 @@ public class ResourceManager {
         }
 
         return (T) resource;
+    }
+
+    public static <T extends Resource> T get(Class<T> type, Path path) {
+        return get(type, path.toString());
     }
 
     /**

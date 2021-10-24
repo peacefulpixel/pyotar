@@ -16,9 +16,9 @@ public class InitialLogicalEntity extends LogicalEntity {
     @Override
     public void init() {
         try {
-            layer.addEntity(new TestGameEntity());
-            layer.addEntity(new TestGameEntity());
-            layer.addEntity(new TestGameEntity2());
+            layer.addEntity(new TestGameEntityVao());
+            layer.addEntity(new TestGameEntityVao());
+            layer.addEntity(new TestGameEntity2Vao());
         } catch (EngineException e) {
             e.printStackTrace();
         }

@@ -4,9 +4,9 @@ import org.example.corp.engine.base.Logical;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Sprite;
 
-public abstract class GameEntity extends SquareEntity implements Logical {
+public abstract class GameEntityVao extends VaoSquareEntity implements Logical {
 
-    public GameEntity(Sprite sprite) throws EngineException {
+    public GameEntityVao(Sprite sprite) throws EngineException {
         super(sprite);
     }
 
