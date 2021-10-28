@@ -1,0 +1,30 @@
+-------------------------
+engine.entity
+-------------------------
+All the entities should be based at least on the Entity class which is root parent in all the entities hierarchy.
+There's current hierarchy visualisation and following description:
+                 Entity                              GuiEntity
+               /    |    \                          /
+  LogicalEntity     |     GuiEntity            TextEntity
+                    |
+             RenderableEntity
+                    |
+               SquareEntity
+              /            \
+  SimpleSquareEntity     VaoSquareEntity
+
+Entity.
+The root parent for all the entities.
+It implements Comparable interface to make all the entity classes implement it by default. Comparability is being used
+in Layers, to sort the entities and the rendering order of them. It helps the engine to build an optimized rendering
+order for OpenGL, which makes it to rarely switch textures, bind shader programs, e.g.
+There's not a lot logic inside, it just have layer as a field, which could be set and changed on the runtime. The
+setLayer method was designed to invoke only inside the engine, since Layer and Entity should be always bound, unless
+entity have no layer set.
+
+LogicalEntity.
+This entity was designed to add some invisible entity to the layer, which couldn't be displayed in any way. Basically,
+it's just an Entity class which realises Logical interface with empty implementations.
+
+RenderableEntity.
+Entity that implements Renderable interface. It has vertex array inside it

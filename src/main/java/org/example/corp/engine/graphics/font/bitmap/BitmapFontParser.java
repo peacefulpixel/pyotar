@@ -132,7 +132,7 @@ public class BitmapFontParser implements FontParser<BitmapFont> {
     @Override
     public BitmapFont parse() throws FontParsingException {
         FontRoot fontRoot = serializeSource();
-        List<Image> images = new ArrayList<>();
+        Map<String, Image> images = new HashMap<>();
         for (Page page : fontRoot.pages) {
             if (isStringNullOrEmpty(page.file))
                 throw new FontParsingException("There's no file defined for page " + page.id);
@@ -143,10 +143,10 @@ public class BitmapFontParser implements FontParser<BitmapFont> {
                 throw new FontParsingException("Couldn't read page file from disk: " + pageFile);
 
             Image pageImage = ResourceManager.get(Image.class, pageFilePath);
-            images.add(pageImage);
+            images.put(page.id, pageImage);
         }
 
-        return new BitmapFont(fontRoot, images.toArray(new Image[0]));
+        return new BitmapFont(fontRoot, images);
     }
 
     private interface TypeConverter {

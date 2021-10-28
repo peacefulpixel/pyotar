@@ -4,9 +4,9 @@ import org.example.corp.engine.base.Logical;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Texture;
 
-public abstract class GameEntityVao extends VaoSquareEntity implements Logical {
+public abstract class GameEntity extends VaoSquareEntity implements Logical {
 
-    public GameEntityVao(Texture ...textures) throws EngineException {
+    public GameEntity(Texture ...textures) throws EngineException {
         super(textures);
     }
 

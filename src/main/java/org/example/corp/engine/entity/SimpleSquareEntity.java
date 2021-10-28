@@ -7,7 +7,7 @@ import org.example.corp.engine.graphics.VertexArray;
 
 import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_BOUNDS;
 
-public class SimpleSquareEntity extends SquareEntity {
+public abstract class SimpleSquareEntity extends SquareEntity {
 
     public SimpleSquareEntity(Texture...textures) throws EngineException {
         super(textures);

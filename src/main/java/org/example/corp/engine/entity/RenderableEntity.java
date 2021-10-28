@@ -13,6 +13,7 @@ import org.example.corp.engine.util.LoggerUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,18 +26,18 @@ public abstract class RenderableEntity extends Entity implements Renderable {
 
     private static final Logger logger = LoggerUtils.getLogger(RenderableEntity.class);
     private static final float[] textureCordsWithElements = new float[] {
-            0.0f, 0.0f, // Top-left
-            1.0f, 0.0f, // Top-right
-            1.0f, 1.0f, // Bottom-right
-            0.0f, 1.0f,  // Bottom-left
+            1.0f, 0.0f, // Top-left
+            0.0f, 0.0f, // Top-right
+            0.0f, 1.0f, // Bottom-right
+            1.0f, 1.0f, // Bottom-left
     };
     private static final float[] textureCordsNoElements = new float[] {
-            0.0f, 0.0f, // Top-left
-            1.0f, 0.0f, // Top-right
-            1.0f, 1.0f, // Bottom-right
-            1.0f, 1.0f, // Bottom-right
-            0.0f, 1.0f,  // Bottom-left
-            0.0f, 0.0f, // Top-left
+            1.0f, 0.0f, // Top-left
+            0.0f, 0.0f, // Top-right
+            0.0f, 1.0f, // Bottom-right
+            0.0f, 1.0f, // Bottom-right
+            1.0f, 1.0f, // Bottom-left
+            1.0f, 0.0f, // Top-left
     };
 
 
@@ -127,8 +128,8 @@ public abstract class RenderableEntity extends Entity implements Renderable {
 
     private void rebuildTransformationMatrix() {
         Camera camera = Window.MAIN_WINDOW.getCamera();
-        transformation = new Matrix4f().ortho2D(-camera.getWidth(), camera.getWidth(), camera.getHeight(),
-                -camera.getHeight()).rotateZ((float) toRadians(rotation));
+        transformation = new Matrix4f().ortho2D(-camera.getWidth()/2, camera.getWidth()/2, camera.getHeight()/2,
+                -camera.getHeight()/2).rotateZ((float) toRadians(rotation));
     }
 
     public void setAxis(float x, float y) {
@@ -138,11 +139,11 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         }
         axisX = x;
         axisY = y;
+        refreshVertexArray();
     }
 
     public void setAxisToMiddle() {
-        axisX = width  / 2.0f;
-        axisY = height / 2.0f;
+        setAxis(width  / 2.0f, height / 2.0f);
     }
 
     /**
@@ -153,18 +154,18 @@ public abstract class RenderableEntity extends Entity implements Renderable {
      * @param w Frame width
      * @param h Frame height
      */
-    public void frame(int x, int y, int w, int h) {
+    public void frame(float x, float y, float w, float h) {
         float horPx = 1.0f / width;
         float verPx = 1.0f / height;
         float[] texCords = new float[] {
-                x * horPx, y * verPx,                           // Top-left
-                x * horPx + w * horPx, y * verPx,              // Top-right
-                x * horPx + w * horPx, y * verPx + h * verPx, // Bottom-right
-                x * horPx, y * verPx + h * verPx,            // Bottom-left
+                x * horPx + w * horPx, y * verPx,                // Top-left
+                x * horPx, y * verPx,                           // Top-right
+                x * horPx, y * verPx + h * verPx,              // Bottom-right
+                x * horPx + w * horPx, y * verPx + h * verPx, // Bottom-left
         };
 
         if (!vertices.isSupportElements()) {
-            texCords = GLUtils.unmapVertexArrayFromElements(texCords, GLUtils.SQUARE_ELEMENTS_ARRAY,
+            texCords = GLUtils.mapVertexArrayOnElements(texCords, GLUtils.SQUARE_ELEMENTS_ARRAY,
                     GLUtils.VECTOR_SIZE_2D);
         }
 
@@ -226,8 +227,43 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         return width;
     }
 
+    public void setWidth(float width) {
+        this.width = width;
+        refreshVertexArray();
+    }
+
     public float getHeight() {
         return height;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
+        refreshVertexArray();
+    }
+
+    public Vector3f getColor() {
+        return color;
+    }
+
+    public void setColor(Vector3f color) {
+        this.color = color;
+    }
+
+    public void setColor(float r, float g, float b) {
+        setColor(new Vector3f(r, g, b));
+    }
+
+    /**
+     * Changes width and height for the entity.
+     * Technically faster then followed calls of {@link #setWidth(float)} and {@link #setHeight(float)}, since this
+     * method refreshes internal vertex array only once, so use that if you need to change width and height in one time
+     * @param width width in pixels
+     * @param height height in pixels
+     */
+    public void setSize(float width, float height) {
+        this.width = width;
+        this.height = height;
+        refreshVertexArray();
     }
 
     @Override
@@ -237,5 +273,16 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         }
 
         return super.compareTo(o);
+    }
+
+    protected <T extends RenderableEntity> void cloneTo(T dest) {
+        super.cloneTo(dest);
+        dest.setX(x);
+        dest.setY(y);
+        dest.setDepth(0.0f);
+        dest.setSize(width, height);
+        dest.setAxis(axisX, axisY);
+        dest.setColor(color.x, color.y, color.z);
+        dest.setRotation(rotation);
     }
 }

@@ -10,7 +10,7 @@ import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_BOUNDS;
 import static org.example.corp.engine.util.GLUtils.SQUARE_ELEMENTS_ARRAY;
 import static org.example.corp.engine.util.GLUtils.VECTOR_SIZE_2D;
 
-public class VaoSquareEntity extends SquareEntity {
+public abstract class VaoSquareEntity extends SquareEntity {
 
     public VaoSquareEntity(Texture...textures) throws EngineException {
         super(textures);

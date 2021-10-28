@@ -1,7 +1,7 @@
 package org.example.corp;
 
 import org.example.corp.engine.Random;
-import org.example.corp.engine.entity.GameEntityVao;
+import org.example.corp.engine.entity.GameEntity;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.Texture;
 import org.example.corp.engine.res.Image;
@@ -9,7 +9,7 @@ import org.example.corp.engine.res.ResourceManager;
 
 import static org.example.corp.engine.GameTime.deltaTime;
 
-public class TestGameEntityVao extends GameEntityVao {
+public class TestGameEntity extends GameEntity {
 
     private float movSpeed, rotationSpeed;
     private boolean moveX;
@@ -30,7 +30,7 @@ public class TestGameEntityVao extends GameEntityVao {
         return t3;
     }
 
-    public TestGameEntityVao() throws EngineException {
+    public TestGameEntity() throws EngineException {
         super(getRandomTexture());
         moveX = Random.genUnsigned() % 2 == 1;
         movSpeed = Random.gen() % 120;

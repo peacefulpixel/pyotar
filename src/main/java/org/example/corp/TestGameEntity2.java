@@ -2,7 +2,7 @@ package org.example.corp;
 
 import org.example.corp.engine.Camera;
 import org.example.corp.engine.Window;
-import org.example.corp.engine.entity.GameEntityVao;
+import org.example.corp.engine.entity.GameEntity;
 import org.example.corp.engine.event.EventManager;
 import org.example.corp.engine.event.impl.MouseMovedEvent;
 import org.example.corp.engine.exception.EngineException;
@@ -10,11 +10,11 @@ import org.example.corp.engine.graphics.Texture;
 import org.example.corp.engine.res.Image;
 import org.example.corp.engine.res.ResourceManager;
 
-public class TestGameEntity2Vao extends GameEntityVao {
+public class TestGameEntity2 extends GameEntity {
 
     private final float movSpeed = 240.0f;
 
-    public TestGameEntity2Vao() throws EngineException {
+    public TestGameEntity2() throws EngineException {
         super(new Texture(ResourceManager.get(Image.class, "nowhere.png")));
     }
 

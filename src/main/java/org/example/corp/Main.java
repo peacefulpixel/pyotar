@@ -6,6 +6,7 @@ import org.example.corp.engine.event.impl.WindowResizedEvent;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.exception.FontParsingException;
 import org.example.corp.engine.exception.ShaderInitializationException;
+import org.example.corp.engine.graphics.font.Font;
 import org.example.corp.engine.graphics.font.FontParser;
 import org.example.corp.engine.graphics.font.bitmap.BitmapFontParser;
 import org.example.corp.engine.res.BitmapFontResource;
@@ -14,6 +15,8 @@ import org.example.corp.engine.shader.DefaultShaderProgram;
 import org.example.corp.engine.shader.ExtraShaderProgram;
 
 public class Main {
+
+    public static Font FONT;
 
     public static void main(String[] args) throws FontParsingException {
         Layer layer = new Layer(DefaultShaderProgram.class);
@@ -40,7 +43,7 @@ public class Main {
         exLayer.addEntity(new InitialLogicalEntity());
 
         BitmapFontParser parser = new BitmapFontParser(ResourceManager.get(BitmapFontResource.class, "res/font/default.fnt"));
-        parser.parse();
+        FONT = parser.parse();
 
         try {
             game.start();

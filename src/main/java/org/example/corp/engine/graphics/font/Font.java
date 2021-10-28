@@ -1,4 +1,11 @@
 package org.example.corp.engine.graphics.font;
 
-public abstract class Font {
+import org.example.corp.engine.entity.TextEntity;
+
+public interface Font {
+    void reloadGlyphs();
+    Glyph getGlyph(int glyphId);
+    TextEntity text(String text);
+    float getLineHeight();
+    float getRightPadding();
 }
