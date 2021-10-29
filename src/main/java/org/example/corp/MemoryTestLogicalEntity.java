@@ -44,7 +44,7 @@ public class MemoryTestLogicalEntity extends LogicalEntity {
             layer.addEntities(entity2);
             TestGameEntity2 x = new TestGameEntity2();
 //            Window.MAIN_WINDOW.getCamera().setSize(100, 50);
-            TextEntity textEntity = Main.FONT.text("Hello world! Nigger lol lmao");
+            TextEntity textEntity = Main.FONT.text("Hello world!\nNigger lol lmao\npoooooog dude)()()(бля");
             textEntity.setX(100f);
             layer.addEntity(textEntity);
 //            x.frame(8, 8, 16, 16);

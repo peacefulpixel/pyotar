@@ -30,7 +30,7 @@ public class TextEntity extends GuiEntity {
         glyphs = new Glyph[length];
 
         int glyphsIndex = 0;
-        int line = 0;
+        int line = 1;
         for (char char_ : text.toCharArray()) {
             if (char_ == '\n') {
                 line++;
@@ -62,9 +62,10 @@ public class TextEntity extends GuiEntity {
                 globalPadding = 0.0f;
             }
             glyph.setX(x + globalPadding);
-            glyph.setY(y - line * font.getLineHeight());
+            glyph.setY(y - line * font.getLineHeight() -
+                    glyph.getHeight() + font.getLineHeight() - glyph.getYOffset());
 
-            globalPadding += glyph.getWidth() + font.getRightPadding();
+            globalPadding += glyph.getXAdvance() + font.getRightPadding();
             glyph.setLayer(layer);
         }
     }

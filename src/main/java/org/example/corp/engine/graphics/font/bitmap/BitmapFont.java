@@ -37,7 +37,7 @@ public class BitmapFont implements Font {
 
         for (Char char_ : fontRoot.chars) {
             try {
-                glyphs.put(char_.id, new Glyph(textures.get(char_.page), char_.x, char_.y, char_.width, char_.height));
+                glyphs.put(char_.id, new Glyph(textures.get(char_.page), char_));
             } catch (EngineException e) {
                 // That shouldn't happen so just logging an exception
                 logger.log(Level.WARNING, "Unable to create glyph: " + char_.id, e);
