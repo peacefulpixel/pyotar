@@ -1,11 +1,9 @@
 package org.example.corp.engine.graphics;
 
 import org.example.corp.engine.shader.Attribute;
-import org.example.corp.engine.util.BufferUtils;
+import org.example.corp.engine.util.GLUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL15.*;
@@ -40,7 +38,7 @@ public class VaoVertexArray extends ElementsBasedVertexArray {
 
         eboId = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
-        BufferUtils.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements, GL_STATIC_DRAW);
+        GLUtils.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -84,14 +82,14 @@ public class VaoVertexArray extends ElementsBasedVertexArray {
 
         glBindVertexArray(vaoId);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
-        BufferUtils.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements, GL_STATIC_DRAW);
+        GLUtils.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements, GL_STATIC_DRAW);
         glBindVertexArray(0);
     }
 
     protected void addBufferWithoutBindings(Attribute attribute, float[] values) {
         int vboId = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboId);
-        BufferUtils.glBufferData(GL_ARRAY_BUFFER, values, GL_STATIC_DRAW);
+        GLUtils.glBufferData(GL_ARRAY_BUFFER, values, GL_STATIC_DRAW);
         glVertexAttribPointer(attribute.getId(), attribute.getSize(), attribute.getGlType(), false, 0, 0);
 
         vboIds.put(attribute, vboId);

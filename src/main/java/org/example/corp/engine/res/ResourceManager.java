@@ -4,6 +4,7 @@ import org.example.corp.engine.exception.ResourceInitializationException;
 import org.example.corp.engine.util.LoggerUtils;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -43,6 +44,10 @@ public class ResourceManager {
         return (T) resource;
     }
 
+    public static <T extends Resource> T get(Class<T> type, Path path) {
+        return get(type, path.toString());
+    }
+
     /**
      * Force load of the resource. If resource was already loaded, it will be reloaded and cached again.
      * It's not recommended to use this function unless resource reloading is required.
@@ -58,6 +63,8 @@ public class ResourceManager {
             resource = new Image();
         } else if (path.endsWith(".vs") || path.endsWith(".fs")) {
             resource = new Shader();
+        } else if (path.endsWith(".fnt")) {
+            resource = new BitmapFontResource();
         }
 
         if (resource == null) {

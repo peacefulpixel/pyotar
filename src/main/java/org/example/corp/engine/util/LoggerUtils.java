@@ -98,4 +98,15 @@ public class LoggerUtils {
     public static String printStackTraceToString() {
         return printStackTraceToString(DEFAULT_ST_SEPARATOR);
     }
+
+    public static String printVertexArrayToString(float[] vertices, int vecSize) {
+        StringBuilder builder = new StringBuilder();
+        for (int x = 0; x < vertices.length; x += vecSize) {
+            for (int y = 0; y < vecSize; y++) {
+                builder.append(vertices[x + y]).append(", ");
+            } builder.append("\n");
+        }
+
+        return builder.toString();
+    }
 }
