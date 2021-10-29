@@ -47,8 +47,6 @@ public class TextEntity extends GuiEntity {
             glyphsIndex++;
         }
 
-        System.out.println("" + glyphsIndex + " " + glyphs.length);
-
 //        layer.addEntities(glyphs);
         glyphReposition();
     }
