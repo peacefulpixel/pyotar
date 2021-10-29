@@ -26,18 +26,18 @@ public abstract class RenderableEntity extends Entity implements Renderable {
 
     private static final Logger logger = LoggerUtils.getLogger(RenderableEntity.class);
     private static final float[] textureCordsWithElements = new float[] {
-            1.0f, 0.0f, // Top-left
-            0.0f, 0.0f, // Top-right
-            0.0f, 1.0f, // Bottom-right
-            1.0f, 1.0f, // Bottom-left
+            0.0f, 0.0f, // Top-left
+            1.0f, 0.0f, // Top-right
+            1.0f, 1.0f, // Bottom-right
+            0.0f, 1.0f, // Bottom-left
     };
     private static final float[] textureCordsNoElements = new float[] {
-            1.0f, 0.0f, // Top-left
-            0.0f, 0.0f, // Top-right
-            0.0f, 1.0f, // Bottom-right
-            0.0f, 1.0f, // Bottom-right
-            1.0f, 1.0f, // Bottom-left
-            1.0f, 0.0f, // Top-left
+            0.0f, 0.0f, // Top-left
+            1.0f, 0.0f, // Top-right
+            1.0f, 1.0f, // Bottom-right
+            1.0f, 1.0f, // Bottom-right
+            0.0f, 1.0f, // Bottom-left
+            0.0f, 0.0f, // Top-left
     };
 
 
@@ -129,7 +129,8 @@ public abstract class RenderableEntity extends Entity implements Renderable {
     private void rebuildTransformationMatrix() {
         Camera camera = Window.MAIN_WINDOW.getCamera();
         transformation = new Matrix4f().ortho2D(-camera.getWidth()/2, camera.getWidth()/2, camera.getHeight()/2,
-                -camera.getHeight()/2).rotateZ((float) toRadians(rotation));
+                -camera.getHeight()/2).rotateZ((float) toRadians(rotation)).scaleXY(-1, 1);
+        //TODO: Validate is scaling is right decision to do here
     }
 
     public void setAxis(float x, float y) {
@@ -158,10 +159,10 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         float horPx = 1.0f / width;
         float verPx = 1.0f / height;
         float[] texCords = new float[] {
-                x * horPx + w * horPx, y * verPx,                // Top-left
-                x * horPx, y * verPx,                           // Top-right
-                x * horPx, y * verPx + h * verPx,              // Bottom-right
-                x * horPx + w * horPx, y * verPx + h * verPx, // Bottom-left
+                x * horPx, y * verPx,                           // Top-left
+                x * horPx + w * horPx, y * verPx,              // Top-right
+                x * horPx + w * horPx, y * verPx + h * verPx, // Bottom-right
+                x * horPx, y * verPx + h * verPx,            // Bottom-left
         };
 
         if (!vertices.isSupportElements()) {

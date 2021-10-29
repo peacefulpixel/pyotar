@@ -39,7 +39,6 @@ public class TextEntity extends GuiEntity {
             try {
                 glyphs[glyphsIndex] = font.getGlyph(char_).cloneIt();
                 glyphs[glyphsIndex].setLine(line);
-                System.out.println("SET TO GLYPH " + glyphs[glyphsIndex]);
             } catch (EngineException e) {
                 // Shouldn't happen
                 logger.log(Level.WARNING, "Couldn't clone a glyph from a font", e);
