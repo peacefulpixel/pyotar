@@ -26,7 +26,7 @@ public class TestGameEntity2 extends GameEntity {
 //            float yDiff = (float) (e.y - e.prevY);
 //            setX(getX() + xDiff);
 //            setY(getY() - yDiff);
-            Camera camera = Window.MAIN_WINDOW.getCamera();
+            Camera camera = layer.getCamera();
             setX((float) e.x - camera.getWidth() / 2 + camera.getX());
             setY((float) -e.y + camera.getHeight() / 2 + camera.getY());
         });

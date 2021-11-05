@@ -1,5 +1,6 @@
 package org.example.corp.engine;
 
+import org.example.corp.engine.base.Delayed;
 import org.example.corp.engine.base.Renderable;
 import org.example.corp.engine.exception.ShaderInitializationException;
 import org.example.corp.engine.util.LoggerUtils;
@@ -89,5 +90,27 @@ public class Stage implements Renderable {
                 layer.free();
             }
         });
+    }
+
+    private static final Layer[] EMPTY_LAYER_ARRAY = new Layer[0];
+
+    /**
+     * It's recommended to use {@link Stage#doToEachLayer(LayerAction)} for doing something with stage layers, to not
+     * get unexpected result caused by lifecycle violation
+     * @return all layers from current stage
+     */
+    public Layer[] getLayers() {
+        return layers.toArray(EMPTY_LAYER_ARRAY);
+    }
+
+    @Delayed
+    public void doToEachLayer(LayerAction action) {
+        for (Layer layer : layers) {
+            tasks.add(() -> action.perform(layer));
+        }
+    }
+
+    public interface LayerAction {
+        void perform(Layer layer);
     }
 }

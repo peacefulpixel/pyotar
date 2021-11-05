@@ -1,5 +1,6 @@
 package org.example.corp.engine;
 
+import org.example.corp.engine.base.Delayed;
 import org.example.corp.engine.base.Logical;
 import org.example.corp.engine.base.Renderable;
 import org.example.corp.engine.entity.Entity;
@@ -30,6 +31,7 @@ public class Layer implements Renderable, Logical {
     private Class<? extends ShaderProgram> shaderClass;
     protected final List<Entity> entities;
     private boolean isAutoSortingEnabled = true;
+    private final Camera camera;
 
     protected boolean doAutoSorting = false;
 
@@ -41,26 +43,31 @@ public class Layer implements Renderable, Logical {
     public Layer(Class<? extends ShaderProgram> shaderClass) {
         entities = new LinkedList<>();
         this.shaderClass = shaderClass;
+        camera = new Camera();
     }
 
     public Layer() {
         this(DefaultShaderProgram.class);
     }
 
+    @Delayed
     public void addEntity(Entity entity) {
         entitiesToAdd.add(entity);
         doAutoSorting = true;
     }
 
+    @Delayed
     public void addEntities(Entity... entities) {
         entitiesToAdd.addAll(Arrays.asList(entities));
         doAutoSorting = true;
     }
 
+    @Delayed
     public void removeEntity(Entity entity) {
         entitiesToRemove.add(entity);
     }
 
+    @Delayed
     public void removeEntities(Class<? extends Entity> clazz) {
         synchronized (entities) {
             for (Entity entity : entities) {
@@ -71,6 +78,7 @@ public class Layer implements Renderable, Logical {
         }
     }
 
+    @Delayed
     public void destroyEntities(Class<? extends Entity> clazz) {
         synchronized (entities) {
             for (Entity entity : entities) {
@@ -183,6 +191,7 @@ public class Layer implements Renderable, Logical {
 
     @Override
     public void render() {
+        camera.activate();
         synchronized (entities) {
             if (isAutoSortingEnabled && doAutoSorting) {
                 doAutoSorting = false;
@@ -214,5 +223,17 @@ public class Layer implements Renderable, Logical {
 
     public ShaderProgram getShaderProgram() {
         return shaderProgram;
+    }
+
+    public Camera getCamera() {
+        return camera;
+    }
+
+    public int getInstancesAmount() {
+        return entities.size();
+    }
+
+    public int getAllInstancesAmount() {
+        return entities.size() + entitiesToAdd.size();
     }
 }

@@ -1,7 +1,6 @@
 package org.example.corp.engine.entity;
 
 import org.example.corp.engine.Camera;
-import org.example.corp.engine.Window;
 import org.example.corp.engine.base.Renderable;
 import org.example.corp.engine.exception.EngineException;
 import org.example.corp.engine.graphics.ElementsBasedVertexArray;
@@ -13,7 +12,6 @@ import org.example.corp.engine.util.LoggerUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,6 +52,7 @@ public abstract class RenderableEntity extends Entity implements Renderable {
     private Vector3f color;
     private Matrix4f transformation;
     private double rotation;
+    private boolean transformationRebuildRequiredFlag = false;
 
     protected float[] vertexArray;
     protected VertexArray vertices;
@@ -108,7 +107,7 @@ public abstract class RenderableEntity extends Entity implements Renderable {
         shaderProgram.setDepth(-depth);
         shaderProgram.setTexture2d(0);
         shaderProgram.setTextureColor(color.x, color.y, color.z); // TODO: ?
-        shaderProgram.setTransformation(transformation);
+        shaderProgram.setTransformation(getTransformation());
         shaderProgram.bindAndPerform(p -> {
             for (Texture texture : textures) {
                 texture.bindTexture();
@@ -127,7 +126,12 @@ public abstract class RenderableEntity extends Entity implements Renderable {
     }
 
     private void rebuildTransformationMatrix() {
-        Camera camera = Window.MAIN_WINDOW.getCamera();
+        if (layer == null) {
+            transformationRebuildRequiredFlag = true;
+            return;
+        }
+
+        Camera camera = layer.getCamera();
         transformation = new Matrix4f().ortho2D(-camera.getWidth()/2, camera.getWidth()/2, camera.getHeight()/2,
                 -camera.getHeight()/2).rotateZ((float) toRadians(rotation)).scaleXY(-1, 1);
         //TODO: Validate is scaling is right decision to do here
@@ -172,6 +176,14 @@ public abstract class RenderableEntity extends Entity implements Renderable {
 
         textureCords = texCords;
         vertices.setBuffer(ATTR_TEXTURE_CORDS, textureCords);
+    }
+
+    private Matrix4f getTransformation() {
+        if (transformationRebuildRequiredFlag) {
+            rebuildTransformationMatrix();
+        }
+
+        return transformation;
     }
 
     public double getRotation() {

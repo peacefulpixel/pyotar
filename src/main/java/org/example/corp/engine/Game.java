@@ -15,9 +15,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
-//TODO: Add text drawing support
 //TODO: Gui items
-//TODO: Controls
 //TODO: Add shapes drawing support
 //TODO: Add audio support
 //TODO: Cursor
@@ -61,6 +59,7 @@ public class Game {
         window.initAfterSettingsContext();
 
         initShaders();
+        window.refreshViewport();
         glActiveTexture(GL_TEXTURE0);
     }
 

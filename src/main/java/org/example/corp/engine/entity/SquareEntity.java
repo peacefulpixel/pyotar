@@ -46,7 +46,7 @@ public abstract class SquareEntity extends RenderableEntity {
     protected boolean shouldBeRendered() {
         float x = getX();
         float y = getY();
-        Camera camera = Window.MAIN_WINDOW.getCamera();
+        Camera camera = layer.getCamera();
 
         boolean tl = camera.isPointVisible(vertexArray[0] + x, vertexArray[1] + y);
         boolean tr = camera.isPointVisible(vertexArray[2] + x, vertexArray[3] + y);

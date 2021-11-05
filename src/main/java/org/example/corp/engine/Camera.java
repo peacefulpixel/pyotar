@@ -3,15 +3,14 @@ package org.example.corp.engine;
 import org.example.corp.engine.event.EventManager;
 import org.example.corp.engine.event.impl.CameraMovedEvent;
 import org.example.corp.engine.event.impl.CameraResizedEvent;
-import org.example.corp.engine.exception.ShaderInitializationException;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.example.corp.engine.util.LoggerUtils;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Camera {
-    private final Logger logger = LoggerUtils.getLogger(Camera.class);
+    private static final Logger logger = LoggerUtils.getLogger(Camera.class);
+    private static Camera currentCamera;
 
     private float x = .0F;
     private float y = .0F;
@@ -27,6 +26,22 @@ public class Camera {
 
     public Camera() {
         this(Window.MAIN_WINDOW.getWidth(), Window.MAIN_WINDOW.getHeight());
+    }
+
+    public void activate() {
+        if (!isActive()) {
+            if (currentCamera != null) currentCamera.deactivate();
+            currentCamera = this;
+        }
+
+        ShaderProgramsManager.bindAndPerform(program -> program.setCameraPosition(x, y));
+    }
+
+    public void deactivate() {
+    }
+
+    public boolean isActive() {
+        return this == currentCamera;
     }
 
     private void refreshAspect() {
@@ -46,7 +61,6 @@ public class Camera {
     }
 
     private void onMove() {
-        ShaderProgramsManager.bindAndPerform(program -> program.setCameraPosition(x, y));
     }
 
     public float getX() {

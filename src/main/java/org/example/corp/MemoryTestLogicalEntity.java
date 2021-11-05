@@ -15,17 +15,15 @@ import org.example.corp.engine.util.LoggerUtils;
 
 import java.util.logging.Logger;
 
-public class MemoryTestLogicalEntity extends LogicalEntity {
+public class MemoryTestLogicalEntity extends InitialLogicalEntity {
 
     Logger logger = LoggerUtils.getLogger(MemoryTestLogicalEntity.class);
     long instanceCounter = 0;
 
-    private InitialLogicalEntity initialLogicalEntity = new InitialLogicalEntity();
-
     @Override
     public void init() {
         EventManager.addEventListener(FpsChangedEvent.class, e -> {
-            logger.info("FPS: " + e.newFps + " INSTANCES: " + instanceCounter);
+            logger.info("FPS: " + e.newFps + " INSTANCES: " + this.layer.getInstancesAmount());
         });
         RenderableEntity.DEFAULT_SCALING = 1.0f;
         try {
@@ -83,6 +81,6 @@ public class MemoryTestLogicalEntity extends LogicalEntity {
 //        } catch (EngineException e) {
 //            e.printStackTrace();
 //        }
-        initialLogicalEntity.loop();
+        super.loop();
     }
 }

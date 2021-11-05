@@ -26,7 +26,7 @@ public class InitialLogicalEntity extends LogicalEntity {
 
     @Override
     public void loop() {
-        Camera camera = Window.MAIN_WINDOW.getCamera();
+        Camera camera = layer.getCamera();
 
         float movSpeed = this.movSpeed;
         if (Keyboard.isKeyPressed(Key.KEY_LEFT_SHIFT)) {

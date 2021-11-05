@@ -4,20 +4,16 @@ import org.example.corp.engine.controls.Key;
 import org.example.corp.engine.controls.Keyboard;
 import org.example.corp.engine.controls.Mouse;
 import org.example.corp.engine.controls.MouseButton;
-import org.example.corp.engine.event.EventListener;
 import org.example.corp.engine.event.EventManager;
 import org.example.corp.engine.event.impl.*;
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.exception.ShaderInitializationException;
 import org.example.corp.engine.exception.WindowInitializationException;
-import org.example.corp.engine.shader.ShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.example.corp.engine.util.LoggerUtils;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.example.corp.engine.controls.KeyAction.*;
@@ -41,7 +37,6 @@ public class Window {
     private int width;
     private int height;
     private boolean vSyncEnabled = false;
-    private Camera camera;
 
     public void init() throws EngineException {
         init(WINDOW_DWIDTH, WINDOW_DHEIGHT, WindowType.BORDERED);
@@ -82,10 +77,6 @@ public class Window {
 
         if (glfwId.get() == NULL) {
             throw new WindowInitializationException("Unable to create GLFW window");
-        }
-
-        if (camera == null) {
-            camera = new Camera();
         }
     }
 
@@ -165,7 +156,7 @@ public class Window {
     }
 
     public void refreshViewport() {
-        refreshViewport(camera.getWidth(), camera.getHeight(), camera.getAspect());
+        refreshViewport(width, height, (double) width / height);
     }
 
     public long getGlfwId() {
@@ -233,20 +224,6 @@ public class Window {
     public void setHeight(int height) {
         this.height = height;
         glfwSetWindowSize(glfwId.get(), width, height);
-    }
-
-    public Camera getCamera() {
-        return camera;
-    }
-
-    public void setCamera(Camera camera) {
-        if (camera == null) {
-            logger.warning("Attempt to set null camera. Ignoring.");
-            return;
-        }
-
-        this.camera = camera;
-        refreshViewport();
     }
 
     public enum WindowType {
