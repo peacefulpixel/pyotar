@@ -6,7 +6,7 @@ import org.example.corp.engine.base.Renderable;
 import org.example.corp.engine.entity.Entity;
 import org.example.corp.engine.entity.RenderableEntity;
 import org.example.corp.engine.exception.ShaderInitializationException;
-import org.example.corp.engine.shader.DefaultShaderProgram;
+import org.example.corp.engine.shader.program.DefaultShaderProgram;
 import org.example.corp.engine.shader.ShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.example.corp.engine.util.LoggerUtils;

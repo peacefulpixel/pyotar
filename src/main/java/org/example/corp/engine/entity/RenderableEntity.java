@@ -16,8 +16,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.lang.Math.toRadians;
-import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_BOUNDS;
-import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_TEXTURE_CORDS;
+import static org.example.corp.engine.shader.program.DefaultShaderProgram.ATTR_BOUNDS;
+import static org.example.corp.engine.shader.program.DefaultShaderProgram.ATTR_TEXTURE_CORDS;
 import static org.lwjgl.opengl.GL30.*;
 
 public abstract class RenderableEntity extends Entity implements Renderable {

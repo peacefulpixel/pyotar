@@ -1,7 +1,7 @@
 package org.example.corp.engine;
 
 import org.example.corp.engine.exception.EngineException;
-import org.example.corp.engine.shader.DefaultShaderProgram;
+import org.example.corp.engine.shader.program.DefaultShaderProgram;
 import org.example.corp.engine.shader.ExtraShaderProgram;
 import org.example.corp.engine.shader.ShaderProgramsManager;
 import org.lwjgl.glfw.GLFWErrorCallback;

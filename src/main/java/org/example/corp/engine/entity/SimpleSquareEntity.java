@@ -5,7 +5,7 @@ import org.example.corp.engine.graphics.SimpleVertexArray;
 import org.example.corp.engine.graphics.Texture;
 import org.example.corp.engine.graphics.VertexArray;
 
-import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_BOUNDS;
+import static org.example.corp.engine.shader.program.DefaultShaderProgram.ATTR_BOUNDS;
 
 public abstract class SimpleSquareEntity extends SquareEntity {
 

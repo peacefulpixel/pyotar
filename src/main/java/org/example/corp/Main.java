@@ -9,10 +9,9 @@ import org.example.corp.engine.graphics.font.Font;
 import org.example.corp.engine.graphics.font.bitmap.BitmapFontParser;
 import org.example.corp.engine.res.BitmapFontResource;
 import org.example.corp.engine.res.ResourceManager;
-import org.example.corp.engine.shader.DefaultShaderProgram;
+import org.example.corp.engine.shader.program.DefaultShaderProgram;
 import org.example.corp.engine.shader.ExtraShaderProgram;
 
-import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Main {

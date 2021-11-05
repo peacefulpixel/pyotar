@@ -6,7 +6,7 @@ import org.example.corp.engine.graphics.VaoVertexArray;
 import org.example.corp.engine.graphics.VertexArray;
 import org.example.corp.engine.util.GLUtils;
 
-import static org.example.corp.engine.shader.DefaultShaderProgram.ATTR_BOUNDS;
+import static org.example.corp.engine.shader.program.DefaultShaderProgram.ATTR_BOUNDS;
 import static org.example.corp.engine.util.GLUtils.SQUARE_ELEMENTS_ARRAY;
 import static org.example.corp.engine.util.GLUtils.VECTOR_SIZE_2D;
 
